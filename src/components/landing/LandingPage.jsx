@@ -1,24 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import TiltCard from '../common/TiltCard';
 import { 
   ArrowRight, 
-  Sparkles, 
   Brain, 
-  CheckCircle2, 
   Zap, 
   Flame, 
   Clock, 
   BookOpen, 
   Layers, 
   TrendingUp, 
-  Check,
-  ChevronRight
+  Check
 } from 'lucide-react';
 
 export default function LandingPage() {
-  const [activeTab, setActiveTab] = useState('notes'); // 'notes' | 'quiz' | 'glossary'
-  const [interactiveQuizAnswer, setInteractiveQuizAnswer] = useState(null);
 
   return (
     <div className="bg-[#F7F3ED] overflow-hidden">
@@ -49,21 +44,13 @@ export default function LandingPage() {
         </p>
 
         {/* CTA Buttons */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+        <div className="mt-8 flex items-center justify-center">
           <Link
             to="/signup"
-            className="btn-tactile w-full sm:w-auto px-7 py-3.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white font-bold text-sm shadow-card flex items-center justify-center gap-2 group"
+            className="btn-tactile w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white font-bold text-sm shadow-card flex items-center justify-center gap-2 group"
           >
             <span>Get Started Free</span>
             <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-          </Link>
-
-          <Link
-            to="/dashboard"
-            className="btn-tactile w-full sm:w-auto px-7 py-3.5 rounded-xl bg-white hover:bg-[#FAF8F5] text-[#222222] font-bold text-sm border border-[#E7E0D8] shadow-xs flex items-center justify-center gap-2"
-          >
-            <span>Explore Live Demo</span>
-            <ChevronRight size={16} className="text-[#706B66]" />
           </Link>
         </div>
 
@@ -83,176 +70,89 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* 2. INTERACTIVE PRODUCT PREVIEW WITH 3D DEPTH */}
-        <div className="mt-14 relative max-w-5xl mx-auto">
+        {/* 2. SIMPLE VISUAL: Paste Content → Generate Notes → Take Quiz */}
+        <div className="mt-14 relative max-w-4xl mx-auto">
           <TiltCard 
-            maxTilt={3} 
-            scale={1.008} 
+            maxTilt={2.5} 
+            scale={1.005} 
             glare={true}
-            className="rounded-2xl border border-[#E7E0D8] bg-white shadow-card text-left card-interactive"
+            className="rounded-2xl border border-[#E7E0D8] bg-white p-6 sm:p-8 shadow-card text-left card-interactive"
           >
-            
-            {/* Window title bar */}
-            <div className="px-4 py-3 bg-[#FAF8F5] border-b border-[#E7E0D8] flex items-center justify-between">
+            {/* Top Bar / Label */}
+            <div className="flex items-center justify-between pb-6 mb-6 border-b border-[#E7E0D8]">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#D8CFC5]"></div>
-                <div className="w-3 h-3 rounded-full bg-[#D8CFC5]"></div>
-                <div className="w-3 h-3 rounded-full bg-[#D8CFC5]"></div>
-                <span className="ml-2 text-xs font-mono text-[#706B66] font-medium">
-                  recallme.app/study/transformer-architecture
+                <span className="w-2.5 h-2.5 rounded-full bg-[#C65D32]"></span>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#222222]">
+                  How RecallMe Works
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-bold text-[#38765C] bg-[#EDF5F1] px-2.5 py-0.5 rounded border border-[#C0DCD0]">
-                  Active Session
-                </span>
+              <span className="text-xs font-mono text-[#706B66] bg-[#FAF8F5] border border-[#E7E0D8] px-2.5 py-1 rounded-md">
+                3-Step Learning Loop
+              </span>
+            </div>
+
+            {/* Visual Steps Flow */}
+            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+              
+              {/* Step 1: Paste Content */}
+              <div className="flex-1 p-5 rounded-xl bg-[#FAF8F5] border border-[#E7E0D8] space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="w-7 h-7 rounded-lg bg-[#222222] text-[#F7F3ED] flex items-center justify-center font-bold text-xs">
+                    01
+                  </span>
+                  <span className="text-[11px] font-mono font-bold text-[#706B66] uppercase">Input</span>
+                </div>
+                <h3 className="font-bold text-[#222222] text-base">
+                  Paste Content
+                </h3>
+                <p className="text-xs text-[#706B66] leading-relaxed">
+                  Raw lecture notes, paper excerpts, or chapter readings.
+                </p>
               </div>
-            </div>
 
-            {/* Interactive Preview Header & Tabs */}
-            <div className="p-6 sm:p-7 border-b border-[#E7E0D8]">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-2 text-xs font-semibold text-[#706B66] mb-1.5">
-                    <span className="px-2.5 py-0.5 rounded bg-[#FBF4EE] text-[#C65D32] border border-[#ECD0C0] font-bold text-[11px]">
-                      Machine Learning
-                    </span>
-                    <span>•</span>
-                    <span>CS 224N</span>
-                    <span>•</span>
-                    <span>7 min read</span>
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-[#222222] tracking-tight">
-                    Transformer Architecture & Scaled Dot-Product Attention
-                  </h3>
-                </div>
-
-                <div className="flex items-center gap-1.5 bg-[#F7F3ED] p-1 rounded-xl border border-[#E7E0D8] self-start sm:self-auto">
-                  <button
-                    onClick={() => setActiveTab('notes')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                      activeTab === 'notes' ? 'bg-white text-[#C65D32] shadow-xs' : 'text-[#706B66] hover:text-[#222222]'
-                    }`}
-                  >
-                    Structured Notes
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('quiz')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                      activeTab === 'quiz' ? 'bg-white text-[#C65D32] shadow-xs' : 'text-[#706B66] hover:text-[#222222]'
-                    }`}
-                  >
-                    Active Quiz
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('glossary')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                      activeTab === 'glossary' ? 'bg-white text-[#C65D32] shadow-xs' : 'text-[#706B66] hover:text-[#222222]'
-                    }`}
-                  >
-                    Glossary
-                  </button>
-                </div>
+              {/* Arrow */}
+              <div className="hidden md:flex items-center justify-center text-[#C65D32] shrink-0 px-1">
+                <ArrowRight size={22} />
               </div>
+
+              {/* Step 2: Generate Notes */}
+              <div className="flex-1 p-5 rounded-xl bg-[#FBF4EE] border border-[#ECD0C0] space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="w-7 h-7 rounded-lg bg-[#C65D32] text-white flex items-center justify-center font-bold text-xs">
+                    02
+                  </span>
+                  <span className="text-[11px] font-mono font-bold text-[#C65D32] uppercase">Synthesis</span>
+                </div>
+                <h3 className="font-bold text-[#222222] text-base">
+                  Generate Notes
+                </h3>
+                <p className="text-xs text-[#706B66] leading-relaxed">
+                  Structured summaries, key terms, and glossary definitions.
+                </p>
+              </div>
+
+              {/* Arrow */}
+              <div className="hidden md:flex items-center justify-center text-[#C65D32] shrink-0 px-1">
+                <ArrowRight size={22} />
+              </div>
+
+              {/* Step 3: Take Quiz */}
+              <div className="flex-1 p-5 rounded-xl bg-[#FAF5EF] border border-[#E8B786] space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="w-7 h-7 rounded-lg bg-[#222222] text-[#E8B786] flex items-center justify-center font-bold text-xs">
+                    03
+                  </span>
+                  <span className="text-[11px] font-mono font-bold text-[#7A3216] uppercase">Retention</span>
+                </div>
+                <h3 className="font-bold text-[#222222] text-base">
+                  Take Quiz
+                </h3>
+                <p className="text-xs text-[#706B66] leading-relaxed">
+                  Active recall tests with explanations and spaced repetition.
+                </p>
+              </div>
+
             </div>
-
-            {/* Tabbed Preview Content */}
-            <div className="p-6 sm:p-7 bg-white min-h-[280px]">
-              {activeTab === 'notes' && (
-                <div className="space-y-4">
-                  <div className="p-4 bg-[#FBF4EE] border-l-4 border-l-[#C65D32] border border-[#ECD0C0] rounded-r-xl space-y-1.5">
-                    <div className="text-xs font-bold text-[#983E1A] flex items-center gap-1.5 uppercase tracking-wider">
-                      <Sparkles size={14} className="text-[#C65D32]" />
-                      <span>Executive Synthesis</span>
-                    </div>
-                    <p className="text-xs sm:text-sm text-[#252525] leading-relaxed">
-                      Scaled Dot-Product attention computes Attention(Q, K, V) = softmax(QK^T / √d_k)V. The scaling factor √d_k normalizes dot product variance to 1.0, preventing vanishing gradients in deep attention stacks.
-                    </p>
-                  </div>
-
-                  <div className="space-y-2 pt-1">
-                    <h4 className="text-sm font-bold text-[#222222]">
-                      1. The Query-Key-Value Dynamic
-                    </h4>
-                    <p className="text-xs sm:text-sm text-[#706B66] leading-relaxed">
-                      Instead of sequential recurrence with O(N) hidden state updates, the Transformer treats sequence transduction as soft retrieval across projected Query, Key, and Value vectors.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'quiz' && (
-                <div className="space-y-4 max-w-xl mx-auto py-2">
-                  <div className="flex items-center justify-between text-xs text-[#706B66] font-bold">
-                    <span>Question 1 of 5</span>
-                    <span className="text-[#C65D32] uppercase tracking-wider">Active Recall</span>
-                  </div>
-
-                  <h4 className="text-sm sm:text-base font-bold text-[#222222]">
-                    Why do Transformers scale query-key dot products by 1/√d_k?
-                  </h4>
-
-                  <div className="space-y-2 pt-1">
-                    {[
-                      { id: 0, text: "To reduce matrix computation complexity from O(N²) to linear O(N)", correct: false },
-                      { id: 1, text: "To normalize dot product variance back to 1.0 and prevent vanishing softmax gradients", correct: true },
-                      { id: 2, text: "To compress sequence length and remove redundant stopwords", correct: false }
-                    ].map((opt) => {
-                      const isSelected = interactiveQuizAnswer === opt.id;
-                      const isSubmitted = interactiveQuizAnswer !== null;
-
-                      let btnStyle = "bg-white border-[#E7E0D8] text-[#252525] hover:bg-[#FAF8F5]";
-                      if (isSubmitted) {
-                        if (opt.correct) btnStyle = "bg-[#EDF5F1] border-[#C0DCD0] text-[#38765C] font-bold";
-                        else if (isSelected) btnStyle = "bg-[#FDF1F1] border-[#F2C6C6] text-[#B93838] line-through";
-                      }
-
-                      return (
-                        <button
-                          key={opt.id}
-                          onClick={() => setInteractiveQuizAnswer(opt.id)}
-                          className={`w-full p-3.5 rounded-xl border text-left text-xs sm:text-sm transition-all flex items-center justify-between ${btnStyle}`}
-                        >
-                          <span>{opt.text}</span>
-                          {isSubmitted && opt.correct && <Check size={16} className="text-[#38765C] shrink-0" />}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {interactiveQuizAnswer !== null && (
-                    <div className="text-xs text-[#706B66] bg-[#FAF8F5] p-3.5 rounded-xl border border-[#E7E0D8]">
-                      <strong className="text-[#222222] font-bold">Active Retrieval Feedback:</strong> Components of high-dimensional vectors yield larger dot products, driving softmax into saturated flat gradients. Dividing by √d_k normalizes variance to 1.0.
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {activeTab === 'glossary' && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  <div className="p-4 bg-white border border-[#E7E0D8] rounded-xl space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-[#222222]">Scaled Dot-Product</span>
-                      <span className="text-[10px] font-mono bg-[#FBF4EE] text-[#C65D32] px-2 py-0.5 rounded font-bold">Mechanism</span>
-                    </div>
-                    <p className="text-xs text-[#706B66] leading-relaxed">
-                      Softmax-based similarity weighted extraction preventing vanishing gradients in deep attention heads.
-                    </p>
-                  </div>
-
-                  <div className="p-4 bg-white border border-[#E7E0D8] rounded-xl space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-[#222222]">Permutation Equivariance</span>
-                      <span className="text-[10px] font-mono bg-[#FBF4EE] text-[#C65D32] px-2 py-0.5 rounded font-bold">Property</span>
-                    </div>
-                    <p className="text-xs text-[#706B66] leading-relaxed">
-                      Inherent invariance to sequence order that necessitates explicit sinusoidal positional encodings.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-
           </TiltCard>
         </div>
 

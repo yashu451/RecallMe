@@ -41,12 +41,6 @@ export default function HomeDashboard({
     navigate('/create');
   };
 
-  const samplePrompts = [
-    { label: "Transformer Attention", text: "Attention mechanisms compute softmax(QK^T / sqrt(d_k))V to weight contextual sequence representations." },
-    { label: "Synaptic Plasticity", text: "Long-Term Potentiation (LTP) requires NMDA magnesium unblocking followed by calcium influx and AMPA receptor trafficking." },
-    { label: "Distributed Consensus", text: "Raft decomposes consensus into randomized leader elections, log replication, and commitment safety invariants." }
-  ];
-
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
       
@@ -111,22 +105,7 @@ export default function HomeDashboard({
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-1">
-            {/* Quick preset chips */}
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-xs text-[#706B66] font-bold mr-1">Quick fill:</span>
-              {samplePrompts.map((p, idx) => (
-                <button
-                  type="button"
-                  key={idx}
-                  onClick={() => setQuickInput(p.text)}
-                  className="btn-tactile text-xs px-2.5 py-1 rounded-lg bg-[#F7F3ED] hover:bg-[#EFE9DF] text-[#252525] font-semibold border border-[#E7E0D8]"
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-
+          <div className="flex justify-end pt-1">
             {/* Primary Action Button with tactile feedback */}
             <button
               type="submit"

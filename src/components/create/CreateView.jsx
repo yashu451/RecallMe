@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Sparkles, 
   ArrowLeft, 
   BookOpen, 
   CheckSquare, 
@@ -10,7 +9,6 @@ import {
   Loader2, 
   Trash2 
 } from 'lucide-react';
-import { SAMPLE_TEXTS_FOR_CREATOR } from '../../data/mockData';
 
 export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
   const navigate = useNavigate();
@@ -36,12 +34,6 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
 
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
   const estimatedReadTime = Math.max(1, Math.ceil(wordCount / 180));
-
-  const handleLoadSample = (sample) => {
-    setTitle(sample.title);
-    setSubject(sample.category);
-    setText(sample.text);
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -92,26 +84,6 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
         <p className="text-sm text-[#706B66] leading-relaxed">
           Paste your lecture transcript, textbook chapter, or research paper excerpt. RecallMe extracts structured summaries, key terminology, and an active recall quiz.
         </p>
-      </div>
-
-      {/* Preset Sample Excerpts */}
-      <div className="p-4 bg-white rounded-2xl border border-[#E7E0D8] space-y-2.5 shadow-subtle">
-        <div className="text-xs font-bold text-[#222222] flex items-center gap-2">
-          <Sparkles size={14} className="text-[#C65D32]" />
-          <span>Or load a pre-configured realistic academic excerpt:</span>
-        </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          {SAMPLE_TEXTS_FOR_CREATOR.map((sample, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => handleLoadSample(sample)}
-              className="btn-tactile text-xs px-3 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#FBF4EE] text-[#252525] hover:text-[#C65D32] border border-[#E7E0D8] hover:border-[#ECD0C0] font-semibold shadow-xs"
-            >
-              Load: {sample.label}
-            </button>
-          ))}
-        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
