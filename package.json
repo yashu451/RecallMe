@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "backend": "cd backend && node server.js",
+    "install:all": "npm install && cd backend && npm install",
     "build": "vite build",
     "preview": "vite preview"
   },
