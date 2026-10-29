@@ -55,6 +55,7 @@ export default function Navbar() {
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Create', path: '/create', icon: PenLine },
     { name: 'My Library', path: '/library', icon: Library },
+    { name: 'Practice Quiz', path: '/quiz', icon: Sparkles },
     { name: 'Quiz History', path: '/history', icon: History },
   ];
 
@@ -90,13 +91,14 @@ export default function Navbar() {
             </Link>
 
             {/* Middle Nav Links for Logged-In Users */}
-            {isAuthenticated && !isPublicPage && (
+            {isAuthenticated && (
               <nav className="hidden md:flex items-center gap-1">
                 {navLinks.map((link) => {
                   const Icon = link.icon;
                   const isActive = location.pathname === link.path || 
                     (link.path === '/library' && location.pathname.startsWith('/study')) ||
-                    (link.path === '/create' && location.pathname.startsWith('/generate'));
+                    (link.path === '/create' && location.pathname.startsWith('/generate')) ||
+                    (link.path.startsWith('/quiz') && location.pathname.startsWith('/quiz'));
 
                   return (
                     <Link
@@ -117,7 +119,7 @@ export default function Navbar() {
             )}
 
             {/* Public Links when on Landing / Logged Out */}
-            {(!isAuthenticated || isPublicPage) && (
+            {!isAuthenticated && (
               <nav className="hidden md:flex items-center gap-6">
                 <a href="/#features" className="text-xs font-semibold text-[#706B66] hover:text-[#222222] transition-colors">
                   Features

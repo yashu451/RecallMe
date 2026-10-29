@@ -8,6 +8,8 @@ import SignupPage from './components/auth/SignupPage';
 import HomeDashboard from './components/dashboard/HomeDashboard';
 import CreateView from './components/create/CreateView';
 import StudyMaterialView from './components/study/StudyMaterialView';
+import QuizHubPage from './pages/QuizHubPage';
+import QuizPage from './pages/QuizPage';
 import RecallQuizView from './components/quiz/RecallQuizView';
 import QuizResultsView from './components/quiz/QuizResultsView';
 import LibraryView from './components/library/LibraryView';
@@ -39,7 +41,7 @@ function QuizRouteWrapper({ topics, onCompleteQuiz }) {
   const topic = topics.find(t => t.id === id) || topics[0];
 
   return (
-    <RecallQuizView 
+    <QuizPage noteId={id || topic?.id || '123'} 
       topic={topic}
       onCompleteQuiz={onCompleteQuiz}
       onExitQuiz={() => navigate(`/study/${topic?.id || ''}`)}
@@ -199,6 +201,22 @@ export default function App() {
               />
 
               {/* Active Recall Quiz */}
+              <Route 
+                path="/quiz" 
+                element={
+                  <ProtectedRoute>
+                    <QuizHubPage savedNotes={topics} />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/quiz/play" 
+                element={
+                  <ProtectedRoute>
+                    <QuizPage onCompleteQuiz={handleCompleteQuiz} />
+                  </ProtectedRoute>
+                } 
+              />
               <Route 
                 path="/quiz/:id" 
                 element={

@@ -58,6 +58,14 @@ export default function LandingPage() {
           </Link>
 
           <Link
+            to="/quiz"
+            className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-[#222222] hover:bg-[#333333] text-white font-bold text-sm shadow-card transition-all flex items-center justify-center gap-2"
+          >
+            <Sparkles size={16} />
+            <span>Test Your Memory (Quiz)</span>
+          </Link>
+
+          <Link
             to="/dashboard"
             className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-white hover:bg-[#FAF8F5] text-[#222222] font-bold text-sm border border-[#E7E0D8] shadow-xs transition-colors flex items-center justify-center gap-2"
           >
@@ -212,6 +220,16 @@ export default function LandingPage() {
                         </button>
                       );
                     })}
+                  </div>
+
+                  <div className="pt-2 text-center">
+                    <Link
+                      to="/quiz"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold transition-all shadow-xs"
+                    >
+                      <Sparkles size={14} />
+                      <span>Launch Full Interactive Quiz Module →</span>
+                    </Link>
                   </div>
 
                   {interactiveQuizAnswer !== null && (
