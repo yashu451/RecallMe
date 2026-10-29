@@ -142,7 +142,7 @@ export default function Navbar() {
                   title="7-Day Active Recall Streak! Keep reviewing daily to maintain momentum."
                 >
                   <Flame size={15} className="text-[#C65D32] fill-[#C65D32]" />
-                  <span>{currentUser?.streak || 7} Days</span>
+                  <span>{currentUser?.streak ?? 0} Days</span>
                 </div>
 
                 {/* Primary Burnt Orange Action Button */}

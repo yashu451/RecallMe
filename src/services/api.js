@@ -6,6 +6,42 @@
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
+export async function apiSignup(name, email, password) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password }),
+      signal: AbortSignal.timeout(4000)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      return { success: false, error: data.error || 'Failed to sign up' };
+    }
+    return { success: true, user: data.user };
+  } catch (err) {
+    return { success: false, error: 'Backend unreachable', offline: true };
+  }
+}
+
+export async function apiLogin(email, password) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+      signal: AbortSignal.timeout(4000)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      return { success: false, error: data.error || 'Login failed' };
+    }
+    return { success: true, user: data.user };
+  } catch (err) {
+    return { success: false, error: 'Backend unreachable', offline: true };
+  }
+}
+
 export async function checkBackendHealth() {
   try {
     const res = await fetch(`${API_BASE_URL}/health`, { signal: AbortSignal.timeout(2000) });

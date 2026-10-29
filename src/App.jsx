@@ -60,7 +60,7 @@ function QuizRouteWrapper({ topics, onCompleteQuiz }) {
 // Protected Route helper
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+  return isAuthenticated ? children : <Navigate to="/signup" replace />;
 }
 
 export default function App() {

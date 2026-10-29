@@ -89,8 +89,65 @@ export async function initDatabase(initialTopics = [], initialHistory = []) {
     )
   `);
 
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      avatar TEXT,
+      streak INTEGER DEFAULT 0,
+      joined_date TEXT
+    )
+  `);
+
   // Clean database initialized for user
   console.log('[SQLite] Ready with user tables.');
+}
+
+// User CRUD operations
+export async function findUserByEmail(email) {
+  if (!email) return null;
+  const row = await dbGet('SELECT * FROM users WHERE LOWER(email) = LOWER(?)', [email.trim()]);
+  if (!row) return null;
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    password: row.password,
+    avatar: row.avatar,
+    streak: row.streak,
+    joinedDate: row.joined_date
+  };
+}
+
+export async function createUser({ name, email, password }) {
+  const id = 'user-' + Date.now();
+  const avatar = name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2) || 'ST';
+  const joinedDate = 'Today';
+
+  await dbRun(
+    'INSERT INTO users (id, name, email, password, avatar, streak, joined_date) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [id, name.trim(), email.trim().toLowerCase(), password, avatar, 0, joinedDate]
+  );
+
+  return {
+    id,
+    name: name.trim(),
+    email: email.trim().toLowerCase(),
+    avatar,
+    streak: 0,
+    dailyGoal: 3,
+    joinedDate,
+    retentionAverage: 0,
+    notifications: true,
+    spacedInterval: '48h'
+  };
 }
 
 // Data conversion helpers

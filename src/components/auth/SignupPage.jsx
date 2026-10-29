@@ -13,8 +13,9 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -38,9 +39,18 @@ export default function SignupPage() {
       return;
     }
 
-    const res = signup(name, email, password);
-    if (res.success) {
-      navigate('/dashboard');
+    setLoading(true);
+    try {
+      const res = await signup(name, email, password);
+      if (res.success) {
+        navigate('/dashboard');
+      } else {
+        setError(res.error || 'Failed to create account.');
+      }
+    } catch (err) {
+      setError('An error occurred during sign up.');
+    } finally {
+      setLoading(false);
     }
   };
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Lock, Mail, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, ArrowRight, UserPlus, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function LoginPage() {
@@ -11,15 +11,16 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [forgotModal, setForgotModal] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
     if (!email || !email.includes('@')) {
-      setError('Please provide a valid study or university email address.');
+      setError('Please provide a valid email address.');
       return;
     }
 
@@ -28,15 +29,19 @@ export default function LoginPage() {
       return;
     }
 
-    const res = login(email, password);
-    if (res.success) {
-      navigate('/dashboard');
+    setLoading(true);
+    try {
+      const res = await login(email, password);
+      if (res.success) {
+        navigate('/dashboard');
+      } else {
+        setError(res.error || 'Login failed. Please verify credentials.');
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const handleDemoLogin = () => {
-    login('alex.chen@stanford.edu', 'password123');
-    navigate('/dashboard');
   };
 
   const handleForgotSubmit = (e) => {
@@ -47,6 +52,8 @@ export default function LoginPage() {
       setForgotModal(false);
     }, 2000);
   };
+
+  const isNewUserError = error.includes('sign up first') || error.includes('No account found');
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-6 bg-[#F7F3ED]">
@@ -61,31 +68,40 @@ export default function LoginPage() {
             Log in to RecallMe
           </h1>
           <p className="text-xs text-[#706B66]">
-            Welcome back! Resume your active recall and study streaks.
+            Enter your registered credentials to resume your active recall studies.
           </p>
         </div>
 
-        {/* Demo Fast-Login Pill (Warm Sand / Burnt Tint) */}
-        <button
-          type="button"
-          onClick={handleDemoLogin}
-          className="w-full py-2.5 px-3 bg-[#FBF4EE] hover:bg-[#F6E7DE] border border-[#ECD0C0] rounded-xl text-xs font-bold text-[#983E1A] flex items-center justify-center gap-2 transition-colors shadow-xs btn-tactile"
-        >
-          <Sparkles size={14} className="text-[#C65D32]" />
-          <span>One-Click Demo Account Login (Alex Chen)</span>
-        </button>
-
-        <div className="relative flex items-center justify-center">
-          <div className="border-t border-[#E7E0D8] w-full"></div>
-          <span className="bg-white px-2.5 text-[11px] uppercase tracking-wider text-[#706B66] font-bold absolute">
-            or with credentials
-          </span>
+        {/* First time notice notice */}
+        <div className="p-3 bg-[#FAF8F5] border border-[#E7E0D8] rounded-xl text-xs text-[#706B66] flex items-center justify-between gap-2">
+          <span>First time on RecallMe?</span>
+          <Link
+            to="/signup"
+            className="text-xs font-bold text-[#C65D32] hover:text-[#983E1A] inline-flex items-center gap-1"
+          >
+            <span>Sign up first</span>
+            <ArrowRight size={12} />
+          </Link>
         </div>
 
         {/* Error Alert */}
         {error && (
-          <div className="p-3 bg-[#FDF1F1] border border-[#F2C6C6] text-[#B93838] text-xs rounded-xl font-medium">
-            {error}
+          <div className="p-3.5 bg-[#FDF1F1] border border-[#F2C6C6] text-[#B93838] text-xs rounded-xl font-medium space-y-2">
+            <div className="flex items-start gap-2">
+              <AlertCircle size={16} className="text-[#B93838] shrink-0 mt-0.5" />
+              <span>{error}</span>
+            </div>
+            {isNewUserError && (
+              <div className="pt-1 border-t border-[#F2C6C6]/60">
+                <Link
+                  to="/signup"
+                  className="inline-flex items-center gap-1 font-bold text-[#C65D32] hover:underline"
+                >
+                  <UserPlus size={13} />
+                  <span>Click here to create your free account now →</span>
+                </Link>
+              </div>
+            )}
           </div>
         )}
 
@@ -131,8 +147,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#706B66] hover:text-[#222222] p-0.5"
-                aria-label="Toggle password visibility"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#706B66] hover:text-[#222222]"
               >
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
@@ -141,18 +156,19 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white font-bold text-xs shadow-xs transition-colors flex items-center justify-center gap-2 btn-tactile"
+            disabled={loading}
+            className="w-full py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide transition-colors flex items-center justify-center gap-2 shadow-xs btn-tactile disabled:opacity-50"
           >
-            <span>Log In to Dashboard</span>
+            <span>{loading ? 'Verifying account...' : 'Log In'}</span>
             <ArrowRight size={14} />
           </button>
         </form>
 
         {/* Signup Link */}
         <div className="text-center text-xs text-[#706B66] pt-1">
-          Don't have an account?{' '}
+          Don't have an account yet?{' '}
           <Link to="/signup" className="text-[#C65D32] hover:text-[#983E1A] font-bold">
-            Create an account for free
+            Sign up first
           </Link>
         </div>
 
@@ -164,13 +180,12 @@ export default function LoginPage() {
           <div className="bg-white rounded-2xl border border-[#E7E0D8] shadow-card max-w-sm w-full p-6 space-y-4">
             <h3 className="text-sm font-bold text-[#222222]">Reset Your Password</h3>
             <p className="text-xs text-[#706B66] leading-relaxed">
-              Enter your study email address and we'll send you a secure link to reset your password.
+              Enter your registered study email address and we'll send you instructions to reset your password.
             </p>
 
             {resetSent ? (
-              <div className="p-3 bg-[#EDF5F1] border border-[#C0DCD0] text-[#38765C] text-xs rounded-xl flex items-center gap-2 font-semibold">
-                <CheckCircle2 size={16} className="text-[#38765C]" />
-                <span>Password reset instructions dispatched to your email!</span>
+              <div className="p-3 bg-[#EDF5F1] border border-[#C0DCD0] text-[#38765C] text-xs rounded-xl font-semibold">
+                Password reset instructions dispatched to your email!
               </div>
             ) : (
               <form onSubmit={handleForgotSubmit} className="space-y-3">

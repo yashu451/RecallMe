@@ -5,6 +5,7 @@ import { initDatabase } from './database/db.js';
 import generateRoutes from './routes/generate.js';
 import topicsRoutes from './routes/topics.js';
 import quizRoutes from './routes/quiz.js';
+import authRoutes from './routes/auth.js';
 import { INITIAL_TOPICS, INITIAL_QUIZ_HISTORY } from '../src/data/mockData.js';
 
 dotenv.config();
@@ -40,6 +41,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // API Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/generate', generateRoutes);
 app.use('/api/topics', topicsRoutes);
 app.use('/api/quiz', quizRoutes);
