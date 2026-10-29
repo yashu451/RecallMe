@@ -34,8 +34,19 @@ function StudyRouteWrapper({ topics, onStartQuiz, onToggleStar, onSaveTopic }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 1. Topic might be passed in location.state (freshly generated note result)
-  const stateTopic = location.state?.topic;
+  // 1. Topic might be passed in location.state or cached in sessionStorage (freshly generated note result)
+  const stateTopic = location.state?.topic || (() => {
+    try {
+      const stored = sessionStorage.getItem('recallme_latest_generated');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.id === id || id === 'generated') return parsed;
+      }
+    } catch {
+      // ignore
+    }
+    return null;
+  })();
 
   // 2. Topic might be found in saved topics array
   const foundTopic = topics.find(t => t.id === id);
@@ -196,6 +207,13 @@ function AppContent() {
   const handleGenerate = async (rawText, userTitle = '', options = {}) => {
     const generated = await generateStudyMaterial(rawText, userTitle, '', options);
     setQuickInputDraft('');
+    if (generated && generated.id) {
+      try {
+        sessionStorage.setItem('recallme_latest_generated', JSON.stringify(generated));
+      } catch (e) {
+        console.warn('Could not cache generated topic in sessionStorage:', e);
+      }
+    }
     return generated;
   };
 
@@ -209,6 +227,11 @@ function AppContent() {
       return [resolved, ...prev];
     });
     setActiveTopicId(resolved.id);
+    try {
+      sessionStorage.removeItem('recallme_latest_generated');
+    } catch {
+      // ignore
+    }
     return resolved;
   };
 

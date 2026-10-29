@@ -149,17 +149,11 @@ export default function HomeDashboard({
       {/* 1. Header & Greeting */}
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E7E0D8] pb-6">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs font-bold text-[#C65D32] uppercase tracking-wider">
-            <Calendar size={14} />
-            <span>Academic Term 2026</span>
-            <span className="text-[#E7E0D8]">•</span>
-            <span className="text-[#706B66] font-medium">Active Recall Rhythm</span>
-          </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#222222] tracking-tight">
-            Your Learning Space, {currentUser?.name?.split(' ')[0] || 'Learner'} 👋
+            Your Learning Space
           </h1>
           <p className="text-sm text-[#706B66] max-w-xl leading-relaxed">
-            Ready to turn today's lectures and reading into permanent retention? Let's verify your conceptual recall.
+            Turn what you learn into knowledge you remember.
           </p>
         </div>
 

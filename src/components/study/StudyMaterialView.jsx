@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -37,6 +37,10 @@ export default function StudyMaterialView({
   const [savedLocal, setSavedLocal] = useState(isSaved);
   const [saveToast, setSaveToast] = useState(false);
   const [saveError, setSaveError] = useState(null);
+
+  useEffect(() => {
+    setSavedLocal(isSaved);
+  }, [isSaved]);
 
   // If loading skeleton
   if (isLoading) {
