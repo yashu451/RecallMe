@@ -140,7 +140,7 @@ export default function Navbar() {
               <>
                 {/* Secondary Sand & Burnt Orange Streak Pill */}
                 <div 
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF5EF] border border-[#E8B786] text-[#7A3216] text-xs font-bold shadow-xs"
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF5EF] border border-[#E8B786] text-[#7A3216] text-xs font-bold shadow-xs card-interactive"
                   title="7-Day Active Recall Streak! Keep reviewing daily to maintain momentum."
                 >
                   <Flame size={15} className="text-[#C65D32] fill-[#C65D32]" />
@@ -150,7 +150,7 @@ export default function Navbar() {
                 {/* Primary Burnt Orange Action Button */}
                 <Link
                   to="/create"
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold shadow-xs transition-colors"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold shadow-xs transition-colors btn-tactile"
                 >
                   <Plus size={14} />
                   <span>Create Notes</span>

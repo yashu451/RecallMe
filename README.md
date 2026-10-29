@@ -33,15 +33,52 @@ RecallMe is a modern, full-featured EdTech web application inspired by the UX pr
 - **Fonts:** Plus Jakarta Sans & Inter (via Google Fonts)
 - **Bundler:** Vite 5
 
-## Getting Started
+## Getting Started (Full-Stack Setup)
 
+### 1. Install Dependencies
 ```bash
-# Install dependencies
-npm install
+# Install frontend & backend dependencies in one command
+npm run install:all
+```
 
-# Start development server
+### 2. Environment Configuration (Backend)
+Copy `.env.example` to `.env` inside the `backend` folder:
+```bash
+cp backend/.env.example backend/.env
+```
+Add your free Google Gemini API key from [Google AI Studio](https://aistudio.google.com/):
+```env
+PORT=5000
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+*(Note: If you run without an API key, RecallMe automatically activates its built-in cognitive synthesis fallback engine so the app remains 100% functional).*
+
+### 3. Run the Application
+
+#### Option A: One-Click Launcher (Windows)
+Double-click **`start-all.bat`** in the project root to launch both the Express backend and React frontend simultaneously.
+
+#### Option B: Terminal
+Open two terminal tabs:
+
+**Terminal 1 — Backend (Port 5000):**
+```bash
+cd backend
+npm start
+```
+
+**Terminal 2 — Frontend (Port 3000 / 5173):**
+```bash
 npm run dev
+```
 
-# Run production build
-npm run build
+Open your browser at `http://localhost:3000` (or `http://localhost:5173`).
+
+---
+
+### Backend Testing Suite
+To verify the SQLite database and Gemini generation endpoints directly:
+```bash
+cd backend
+npm test
 ```

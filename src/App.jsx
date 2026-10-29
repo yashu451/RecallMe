@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useParams, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/layout/Navbar';
@@ -17,6 +17,16 @@ import QuizHistoryView from './components/quiz/QuizHistoryView';
 
 import { INITIAL_TOPICS, INITIAL_QUIZ_HISTORY } from './data/mockData';
 import { generateStudyMaterialFromText } from './utils/studyGenerator';
+import { 
+  generateStudyMaterial, 
+  fetchTopics, 
+  toggleTopicStarBackend, 
+  deleteTopicBackend, 
+  fetchQuizHistory, 
+  recordQuizAttempt 
+} from './services/api';
+
+import AmbientBackground from './components/common/AmbientBackground';
 
 // Wrapper to find topic by ID for Study view
 function StudyRouteWrapper({ topics, onStartQuiz, onToggleStar }) {
@@ -56,13 +66,35 @@ function ProtectedRoute({ children }) {
 }
 
 export default function App() {
-  const [topics, setTopics] = useState(INITIAL_TOPICS);
-  const [activeTopicId, setActiveTopicId] = useState(INITIAL_TOPICS[0].id);
-  const [quizHistory, setQuizHistory] = useState(INITIAL_QUIZ_HISTORY);
+  const [topics, setTopics] = useState([]);
+  const [activeTopicId, setActiveTopicId] = useState(null);
+  const [quizHistory, setQuizHistory] = useState([]);
   const [latestQuizResult, setLatestQuizResult] = useState(null);
   const [quickInputDraft, setQuickInputDraft] = useState('');
 
-  const activeTopic = topics.find(t => t.id === activeTopicId) || topics[0];
+  // Fetch live data from backend SQLite on mount
+  useEffect(() => {
+    async function loadBackendData() {
+      const backendTopics = await fetchTopics();
+      if (backendTopics && backendTopics.length > 0) {
+        setTopics(backendTopics);
+        setActiveTopicId(backendTopics[0].id);
+      } else {
+        setTopics([]);
+        setActiveTopicId(null);
+      }
+
+      const backendHistory = await fetchQuizHistory();
+      if (backendHistory && backendHistory.length > 0) {
+        setQuizHistory(backendHistory);
+      } else {
+        setQuizHistory([]);
+      }
+    }
+    loadBackendData();
+  }, []);
+
+  const activeTopic = topics.find(t => t.id === activeTopicId) || topics[0] || null;
 
   const handleSelectTopic = (topic) => {
     setActiveTopicId(topic.id);
@@ -72,7 +104,7 @@ export default function App() {
     setActiveTopicId(topic.id);
   };
 
-  const handleCompleteQuiz = (result) => {
+  const handleCompleteQuiz = async (result) => {
     setLatestQuizResult(result);
 
     // Update mastery score for topic
@@ -103,27 +135,30 @@ export default function App() {
         : 'Review suggested on highlighted questions.'
     };
     setQuizHistory(prev => [historyEntry, ...prev]);
+
+    // Persist to backend SQLite
+    await recordQuizAttempt(historyEntry);
   };
 
-  const handleGenerate = (rawText, userTitle, options) => {
-    const newTopic = generateStudyMaterialFromText(rawText, userTitle, options);
+  const handleGenerate = async (rawText, userTitle, options, subject) => {
+    const newTopic = await generateStudyMaterial(rawText, userTitle, subject, options);
     setTopics(prev => [newTopic, ...prev]);
     setActiveTopicId(newTopic.id);
     setQuickInputDraft('');
-    window.location.hash = '';
     return newTopic;
   };
 
-  const handleToggleStar = (topicId) => {
+  const handleToggleStar = async (topicId) => {
     setTopics(prev => prev.map(t => {
       if (t.id === topicId) {
         return { ...t, isStarred: !t.isStarred };
       }
       return t;
     }));
+    await toggleTopicStarBackend(topicId);
   };
 
-  const handleDeleteTopic = (topicId) => {
+  const handleDeleteTopic = async (topicId) => {
     if (window.confirm("Remove this study material from your library?")) {
       setTopics(prev => prev.filter(t => t.id !== topicId));
       if (activeTopicId === topicId) {
@@ -132,18 +167,22 @@ export default function App() {
           setActiveTopicId(remaining[0].id);
         }
       }
+      await deleteTopicBackend(topicId);
     }
   };
 
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div className="min-h-screen bg-ivory text-mainText flex flex-col antialiased font-sans">
+        <div className="min-h-screen bg-ivory text-mainText flex flex-col antialiased font-sans relative">
+          {/* Subtle Ambient Background Depth */}
+          <AmbientBackground />
+
           {/* Polished Top Navigation */}
           <Navbar />
 
           {/* Main Content Area */}
-          <main className="flex-1">
+          <main className="flex-1 page-enter">
             <Routes>
               {/* Public Marketing / Auth Routes */}
               <Route path="/" element={<LandingPage />} />
@@ -172,8 +211,8 @@ export default function App() {
                   <ProtectedRoute>
                     <CreateView 
                       initialText={quickInputDraft}
-                      onGenerate={(rawText, title, options) => {
-                        const created = handleGenerate(rawText, title, options);
+                      onGenerate={async (rawText, title, options, subject) => {
+                        const created = await handleGenerate(rawText, title, options, subject);
                         window.location.href = `/study/${created.id}`;
                       }}
                       onCancel={() => window.location.href = '/dashboard'}
@@ -197,7 +236,7 @@ export default function App() {
               />
               <Route 
                 path="/study" 
-                element={<Navigate to={`/study/${activeTopic?.id || topics[0].id}`} replace />} 
+                element={<Navigate to={activeTopic ? `/study/${activeTopic.id}` : '/dashboard'} replace />} 
               />
 
               {/* Active Recall Quiz */}
