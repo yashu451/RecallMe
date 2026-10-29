@@ -18,8 +18,8 @@ import {
  * - Score (e.g. 8/10) & percentage
  * - Correct & incorrect counts
  * - Performance feedback message
- * - Item-by-item breakdown with user answer, correct answer, and explanation
- * - "Try Again" and "Back to Practice Quiz" buttons
+ * - Item-by-item breakdown with user answer, correct answer, source note attribution, and explanation
+ * - "Try Again" and "Back to Practice Quiz Hub" buttons
  */
 export default function QuizResults({
   result,
@@ -62,28 +62,28 @@ export default function QuizResults({
         badge: 'Perfect Mastery',
         badgeColor: 'bg-[#EDF5F1] text-[#38765C] border-[#C0DCD0]',
         title: 'Outstanding Memory Retention!',
-        desc: 'Flawless recall across all core concepts and invariants. Your active retrieval pathways for this topic are thoroughly reinforced.',
+        desc: 'Flawless recall across all core concepts and invariants. Your active retrieval pathways for this material are thoroughly reinforced.',
       };
     } else if (pct >= 75) {
       return {
         badge: 'Strong Retention',
         badgeColor: 'bg-[#FBF4EE] text-[#983E1A] border-[#ECD0C0]',
         title: 'Great Job! Solid Foundation',
-        desc: 'You demonstrated strong conceptual understanding. Review the highlighted items below to solidify the remaining nuances.',
+        desc: 'You demonstrated strong conceptual understanding of your notes. Review the highlighted items below to solidify remaining details.',
       };
     } else if (pct >= 50) {
       return {
         badge: 'Moderate Recall',
         badgeColor: 'bg-[#FAF5EF] text-[#7A3216] border-[#E8B786]',
         title: 'Good Effort! Some Gaps Remain',
-        desc: 'You have grasped the general ideas, but several core definitions or mechanisms need another review in the study notes.',
+        desc: 'You grasped the general ideas, but several core definitions or mechanisms need another review in your study notes.',
       };
     } else {
       return {
         badge: 'Needs Review',
         badgeColor: 'bg-[#FDF1F1] text-[#B93838] border-[#F2C6C6]',
         title: 'Active Learning Opportunity',
-        desc: 'Retrieval practice is most effective when confronting challenging gaps. Read the explanations below and try the quiz again.',
+        desc: 'Retrieval practice is most effective when confronting challenging gaps. Read the explanations below and review your notes.',
       };
     }
   };
@@ -95,14 +95,14 @@ export default function QuizResults({
       
       {/* Top Header Row with Navigation */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#E7E0D8]">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             type="button"
             onClick={onBackToHub}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-[#706B66] hover:text-[#222222] bg-white hover:bg-[#FAF8F5] border border-[#E7E0D8] rounded-xl transition-colors shadow-2xs"
           >
             <LayoutGrid size={14} className="text-[#C65D32]" />
-            <span>Back to Practice Quiz Hub</span>
+            <span>Practice Hub</span>
           </button>
 
           {onBackToNotes && (
@@ -112,7 +112,7 @@ export default function QuizResults({
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-[#706B66] hover:text-[#222222] bg-white hover:bg-[#FAF8F5] border border-[#E7E0D8] rounded-xl transition-colors"
             >
               <BookOpen size={14} />
-              <span>Notes</span>
+              <span>Study Notes</span>
             </button>
           )}
 
@@ -139,17 +139,17 @@ export default function QuizResults({
         {/* Header with Title and Streak */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E7E0D8] pb-6">
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${feedback.badgeColor}`}>
                 <Award size={13} />
                 <span>{feedback.badge}</span>
               </span>
               <span className="text-xs text-[#706B66] font-mono">
-                {domain ? `${domain} • ` : ''}{topicTitle}
+                {topicTitle}
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[#222222] tracking-tight">
                 {feedback.title}
               </h2>
@@ -206,7 +206,7 @@ export default function QuizResults({
 
           <div className="col-span-2 sm:col-span-1 p-3.5 bg-[#FBF4EE] border border-[#ECD0C0] rounded-xl">
             <div className="text-[11px] uppercase tracking-wider font-bold text-[#983E1A]">
-              Topic Assessed
+              Material Assessed
             </div>
             <div className="text-sm font-bold text-[#222222] mt-1 truncate" title={topicTitle}>
               {topicTitle}
@@ -222,7 +222,7 @@ export default function QuizResults({
             className="px-5 py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide transition-colors flex items-center gap-2 shadow-xs"
           >
             <RotateCcw size={15} />
-            <span>Try Again (Same Quiz)</span>
+            <span>Retry Quiz</span>
           </button>
 
           <button
@@ -231,7 +231,7 @@ export default function QuizResults({
             className="px-4 py-2.5 rounded-xl bg-white hover:bg-[#FAF8F5] text-[#222222] text-xs font-bold border border-[#E7E0D8] transition-colors flex items-center gap-2 shadow-xs"
           >
             <LayoutGrid size={15} className="text-[#C65D32]" />
-            <span>Choose Different Topic</span>
+            <span>Select Different Notes</span>
           </button>
         </div>
 
@@ -261,11 +261,19 @@ export default function QuizResults({
                     : 'border-[#E7E0D8] border-l-4 border-l-[#B93838]'
                 }`}
               >
-                {/* Question index & correct/incorrect indicator */}
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold text-[#706B66]">
-                    Question {idx + 1}
-                  </span>
+                {/* Question index & correct/incorrect indicator & source note attribution */}
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-bold text-[#706B66]">
+                      Question {idx + 1}
+                    </span>
+                    {item.sourceNoteTitle && (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-mono text-[#706B66] bg-[#FAF8F5] px-2 py-0.5 rounded border border-[#E7E0D8]">
+                        <BookOpen size={10} className="text-[#C65D32]" />
+                        <span>{item.sourceNoteTitle}</span>
+                      </span>
+                    )}
+                  </div>
 
                   <div className="flex items-center gap-1.5">
                     {isCorrect ? (
@@ -330,12 +338,12 @@ export default function QuizResults({
                   })}
                 </div>
 
-                {/* Explanation rationale */}
+                {/* Explanation rationale grounded in note */}
                 {item.explanation && (
                   <div className="p-4 bg-[#FAF8F5] border border-[#E7E0D8] rounded-xl text-xs sm:text-sm text-[#252525] leading-relaxed space-y-1">
                     <div className="font-bold text-[#222222] flex items-center gap-1.5">
                       <AlertCircle size={14} className="text-[#C65D32]" />
-                      <span>Active Retrieval Rationale:</span>
+                      <span>Note Context & Explanation:</span>
                     </div>
                     <p className="text-[#706B66] pl-5">
                       {item.explanation}

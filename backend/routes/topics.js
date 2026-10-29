@@ -11,11 +11,12 @@ const router = express.Router();
 
 /**
  * GET /api/topics
- * Returns all saved topics from SQLite
+ * Returns all saved topics from SQLite (filtered by user if supplied)
  */
 router.get('/', async (req, res) => {
   try {
-    const topics = await getAllTopics();
+    const userId = req.query.userId || req.headers['x-user-id'] || null;
+    const topics = await getAllTopics(userId);
     res.json(topics);
   } catch (error) {
     console.error('[API GET /api/topics] Error:', error);
@@ -49,6 +50,10 @@ router.post('/', async (req, res) => {
     const topicData = req.body;
     if (!topicData || !topicData.id || !topicData.title) {
       return res.status(400).json({ error: 'Valid topic with id and title is required' });
+    }
+    const userId = req.body.userId || req.headers['x-user-id'] || null;
+    if (userId && !topicData.userId) {
+      topicData.userId = userId;
     }
     const saved = await saveTopic(topicData);
     res.status(201).json(saved);

@@ -6,6 +6,19 @@
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
+function getActiveUserId() {
+  try {
+    const userStr = localStorage.getItem('recallme_user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      return user.id || null;
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
 export async function apiSignup(name, email, password) {
   try {
     const res = await fetch(`${API_BASE_URL}/auth/signup`, {
@@ -55,15 +68,20 @@ export async function checkBackendHealth() {
 }
 
 export async function generateStudyMaterial(text, title = '', subject = 'General Science', options = {}) {
+  const userId = getActiveUserId();
   try {
     const res = await fetch(`${API_BASE_URL}/generate`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        ...(userId ? { 'x-user-id': userId } : {})
+      },
       body: JSON.stringify({
         text,
         title,
         subject,
         options,
+        userId,
         saveToDb: true
       }),
       signal: AbortSignal.timeout(30000)
@@ -83,8 +101,13 @@ export async function generateStudyMaterial(text, title = '', subject = 'General
 }
 
 export async function fetchTopics() {
+  const userId = getActiveUserId();
   try {
-    const res = await fetch(`${API_BASE_URL}/topics`, { signal: AbortSignal.timeout(3000) });
+    const url = userId ? `${API_BASE_URL}/topics?userId=${encodeURIComponent(userId)}` : `${API_BASE_URL}/topics`;
+    const res = await fetch(url, { 
+      headers: userId ? { 'x-user-id': userId } : {},
+      signal: AbortSignal.timeout(3000) 
+    });
     if (res.ok) {
       return await res.json();
     }
@@ -95,11 +118,15 @@ export async function fetchTopics() {
 }
 
 export async function persistTopic(topic) {
+  const userId = getActiveUserId();
   try {
     const res = await fetch(`${API_BASE_URL}/topics`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(topic),
+      headers: { 
+        'Content-Type': 'application/json',
+        ...(userId ? { 'x-user-id': userId } : {})
+      },
+      body: JSON.stringify({ ...topic, userId: topic.userId || userId }),
       signal: AbortSignal.timeout(3000)
     });
     if (res.ok) {
@@ -142,8 +169,13 @@ export async function deleteTopicBackend(topicId) {
 }
 
 export async function fetchQuizHistory() {
+  const userId = getActiveUserId();
   try {
-    const res = await fetch(`${API_BASE_URL}/quiz/history`, { signal: AbortSignal.timeout(3000) });
+    const url = userId ? `${API_BASE_URL}/quiz/history?userId=${encodeURIComponent(userId)}` : `${API_BASE_URL}/quiz/history`;
+    const res = await fetch(url, { 
+      headers: userId ? { 'x-user-id': userId } : {},
+      signal: AbortSignal.timeout(3000) 
+    });
     if (res.ok) {
       return await res.json();
     }
@@ -154,11 +186,15 @@ export async function fetchQuizHistory() {
 }
 
 export async function recordQuizAttempt(attempt) {
+  const userId = getActiveUserId();
   try {
     const res = await fetch(`${API_BASE_URL}/quiz/attempt`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(attempt),
+      headers: { 
+        'Content-Type': 'application/json',
+        ...(userId ? { 'x-user-id': userId } : {})
+      },
+      body: JSON.stringify({ ...attempt, userId: attempt.userId || userId }),
       signal: AbortSignal.timeout(3000)
     });
     if (res.ok) {
@@ -168,4 +204,32 @@ export async function recordQuizAttempt(attempt) {
     console.warn('[API] Could not save quiz attempt in backend:', err.message);
   }
   return attempt;
+}
+
+/**
+ * Generate quiz questions strictly from selected study notes
+ */
+export async function generateQuizFromNotesApi({ noteIds = [], notes = [], difficulty = 'Medium', count = 5 }) {
+  const userId = getActiveUserId();
+  const res = await fetch(`${API_BASE_URL}/quiz/generate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(userId ? { 'x-user-id': userId } : {})
+    },
+    body: JSON.stringify({
+      noteIds,
+      notes,
+      difficulty,
+      count,
+      userId
+    }),
+    signal: AbortSignal.timeout(30000)
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'Failed to generate quiz from selected study notes');
+  }
+  return data;
 }

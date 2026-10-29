@@ -69,7 +69,8 @@ export async function initDatabase(initialTopics = [], initialHistory = []) {
       takeaways TEXT,
       keywords TEXT,
       definitions TEXT,
-      quiz TEXT
+      quiz TEXT,
+      user_id TEXT
     )
   `);
 
@@ -85,7 +86,8 @@ export async function initDatabase(initialTopics = [], initialHistory = []) {
       time_taken TEXT,
       date TEXT,
       feedback TEXT,
-      review_details TEXT
+      review_details TEXT,
+      user_id TEXT
     )
   `);
 
@@ -101,7 +103,18 @@ export async function initDatabase(initialTopics = [], initialHistory = []) {
     )
   `);
 
-  // Clean database initialized for user
+  // Ensure user_id column exists if tables were already created previously
+  try {
+    await dbRun('ALTER TABLE topics ADD COLUMN user_id TEXT');
+  } catch (err) {
+    // Column already exists
+  }
+  try {
+    await dbRun('ALTER TABLE quiz_attempts ADD COLUMN user_id TEXT');
+  } catch (err) {
+    // Column already exists
+  }
+
   console.log('[SQLite] Ready with user tables.');
 }
 
@@ -169,7 +182,8 @@ export function serializeTopic(topic) {
     JSON.stringify(topic.takeaways || []),
     JSON.stringify(topic.keywords || []),
     JSON.stringify(topic.definitions || []),
-    JSON.stringify(topic.quiz || [])
+    JSON.stringify(topic.quiz || []),
+    topic.userId || null
   ];
 }
 
@@ -192,12 +206,18 @@ export function deserializeTopic(row) {
     takeaways: JSON.parse(row.takeaways || '[]'),
     keywords: JSON.parse(row.keywords || '[]'),
     definitions: JSON.parse(row.definitions || '[]'),
-    quiz: JSON.parse(row.quiz || '[]')
+    quiz: JSON.parse(row.quiz || '[]'),
+    userId: row.user_id || null
   };
 }
 
-export async function getAllTopics() {
-  const rows = await dbAll('SELECT * FROM topics ORDER BY rowid DESC');
+export async function getAllTopics(userId = null) {
+  let rows;
+  if (userId) {
+    rows = await dbAll('SELECT * FROM topics WHERE user_id = ? OR user_id IS NULL ORDER BY rowid DESC', [userId]);
+  } else {
+    rows = await dbAll('SELECT * FROM topics ORDER BY rowid DESC');
+  }
   return rows.map(deserializeTopic);
 }
 
@@ -206,13 +226,20 @@ export async function getTopicById(id) {
   return deserializeTopic(row);
 }
 
+export async function getTopicsByIds(ids = []) {
+  if (!ids || ids.length === 0) return [];
+  const placeholders = ids.map(() => '?').join(',');
+  const rows = await dbAll(`SELECT * FROM topics WHERE id IN (${placeholders})`, ids);
+  return rows.map(deserializeTopic);
+}
+
 export async function saveTopic(topic) {
   const sql = `
     INSERT OR REPLACE INTO topics (
       id, title, subject, subject_code, read_time, created_at,
       last_studied, mastery_score, is_starred, tags, summary,
-      source_excerpt, sections, takeaways, keywords, definitions, quiz
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      source_excerpt, sections, takeaways, keywords, definitions, quiz, user_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
   await dbRun(sql, serializeTopic(topic));
   return getTopicById(topic.id);
@@ -239,8 +266,13 @@ export async function deleteTopic(id) {
   return { success: true };
 }
 
-export async function getAllQuizHistory() {
-  const rows = await dbAll('SELECT * FROM quiz_attempts ORDER BY rowid DESC');
+export async function getAllQuizHistory(userId = null) {
+  let rows;
+  if (userId) {
+    rows = await dbAll('SELECT * FROM quiz_attempts WHERE user_id = ? OR user_id IS NULL ORDER BY rowid DESC', [userId]);
+  } else {
+    rows = await dbAll('SELECT * FROM quiz_attempts ORDER BY rowid DESC');
+  }
   return rows.map(r => ({
     id: r.id,
     topicId: r.topic_id,
@@ -252,7 +284,8 @@ export async function getAllQuizHistory() {
     timeTaken: r.time_taken,
     date: r.date,
     feedback: r.feedback,
-    reviewDetails: r.review_details ? JSON.parse(r.review_details) : null
+    reviewDetails: r.review_details ? JSON.parse(r.review_details) : null,
+    userId: r.user_id || null
   }));
 }
 
@@ -260,8 +293,8 @@ export async function saveQuizAttempt(attempt) {
   const sql = `
     INSERT OR REPLACE INTO quiz_attempts (
       id, topic_id, topic_title, subject, score, total_questions,
-      percentage, time_taken, date, feedback, review_details
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      percentage, time_taken, date, feedback, review_details, user_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
   await dbRun(sql, [
     attempt.id || ('hist-' + Date.now()),
@@ -274,11 +307,12 @@ export async function saveQuizAttempt(attempt) {
     attempt.timeTaken,
     attempt.date || new Date().toISOString().split('T')[0],
     attempt.feedback || '',
-    JSON.stringify(attempt.reviewDetails || [])
+    JSON.stringify(attempt.reviewDetails || []),
+    attempt.userId || null
   ]);
 
-  // Also update topic mastery score if topic exists
-  if (attempt.topicId && attempt.percentage !== undefined) {
+  // Also update topic mastery score if single topic
+  if (attempt.topicId && attempt.percentage !== undefined && !attempt.topicId.includes(',')) {
     await updateTopicMastery(attempt.topicId, attempt.percentage);
   }
 

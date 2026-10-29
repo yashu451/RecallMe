@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id', 'X-User-Id']
 }));
 
 // Body parsing with generous limit for full lectures & PDFs
@@ -69,6 +69,7 @@ async function startServer() {
       console.log(`  Health:    http://localhost:${PORT}/api/health`);
       console.log(`  Endpoints: POST /api/generate`);
       console.log(`             GET/POST/DELETE /api/topics`);
+      console.log(`             GET/POST /api/quiz/generate`);
       console.log(`             GET/POST /api/quiz/history`);
       console.log(`===============================================`);
     });
