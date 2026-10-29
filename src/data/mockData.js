@@ -614,3 +614,4 @@ The Taylor Principle:
 A fundamental insight of the rule is that the coefficient on inflation exceeds 1.0 (since 1 + 0.5 = 1.5). When inflation rises by 1 percentage point, the central bank must raise the nominal interest rate by more than 1 percentage point (specifically 1.5 percentage points). This ensures that the REAL interest rate (r = i - pi) rises, tightening financial conditions, reducing aggregate demand, and cooling inflationary pressures. If the central bank raises rates by less than the increase in inflation, real interest rates fall, inadvertently stimulating the economy and triggering an inflationary spiral.`
   }
 ];
+

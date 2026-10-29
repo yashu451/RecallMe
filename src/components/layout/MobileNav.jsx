@@ -100,3 +100,4 @@ export default function MobileNav({ currentView, setCurrentView, libraryCount = 
     </div>
   );
 }
+

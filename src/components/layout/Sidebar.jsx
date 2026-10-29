@@ -139,3 +139,4 @@ export default function Sidebar({ currentView, setCurrentView, libraryCount = 0 
     </aside>
   );
 }
+

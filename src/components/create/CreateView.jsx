@@ -316,3 +316,4 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
     </div>
   );
 }
+
