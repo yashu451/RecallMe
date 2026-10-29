@@ -1,16 +1,15 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import TiltCard from '../common/TiltCard';
-import {
-  ArrowRight,
-  Brain,
-  Zap,
-  Flame,
-  Clock,
-  BookOpen,
-  Layers,
-  TrendingUp,
+import { 
+  ArrowRight, 
+  Brain, 
+  Zap, 
+  Flame, 
+  Clock, 
+  BookOpen, 
+  Layers, 
+  TrendingUp, 
   Check
 } from 'lucide-react';
 
@@ -18,10 +17,10 @@ export default function LandingPage() {
 
   return (
     <div className="bg-[#F7F3ED] overflow-hidden">
-
+      
       {/* 1. HERO SECTION */}
       <section className="relative pt-12 pb-20 sm:pt-20 sm:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
-
+        
         {/* Subtle warm decorative glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-96 bg-[#ECD0C0]/20 blur-3xl -z-10 pointer-events-none" />
 
@@ -45,21 +44,13 @@ export default function LandingPage() {
         </p>
 
         {/* CTA Buttons */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <div className="mt-8 flex items-center justify-center">
           <Link
             to="/signup"
             className="btn-tactile w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white font-bold text-sm shadow-card flex items-center justify-center gap-2 group"
           >
             <span>Get Started Free</span>
             <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-          </Link>
-
-          <Link
-            to="/quiz"
-            className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-[#222222] hover:bg-[#333333] text-white font-bold text-sm shadow-card transition-all flex items-center justify-center gap-2"
-          >
-            <Brain size={16} />
-            <span>Test Your Memory (Quiz)</span>
           </Link>
         </div>
 
@@ -81,9 +72,9 @@ export default function LandingPage() {
 
         {/* 2. SIMPLE VISUAL: Paste Content → Generate Notes → Take Quiz */}
         <div className="mt-14 relative max-w-4xl mx-auto">
-          <TiltCard
-            maxTilt={2.5}
-            scale={1.005}
+          <TiltCard 
+            maxTilt={2.5} 
+            scale={1.005} 
             glare={true}
             className="rounded-2xl border border-[#E7E0D8] bg-white p-6 sm:p-8 shadow-card text-left card-interactive"
           >
@@ -102,7 +93,7 @@ export default function LandingPage() {
 
             {/* Visual Steps Flow */}
             <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-
+              
               {/* Step 1: Paste Content */}
               <div className="flex-1 p-5 rounded-xl bg-[#FAF8F5] border border-[#E7E0D8] space-y-2">
                 <div className="flex items-center justify-between">
@@ -170,7 +161,7 @@ export default function LandingPage() {
       {/* 3. HOW IT WORKS */}
       <section id="how-it-works" className="py-20 bg-white border-y border-[#E7E0D8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
+          
           <div className="text-center max-w-3xl mx-auto space-y-2.5">
             <h2 className="text-xs font-bold uppercase tracking-wider text-[#C65D32]">
               Structured Workflow
@@ -223,7 +214,7 @@ export default function LandingPage() {
 
       {/* 4. FEATURES SECTION */}
       <section id="features" className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
+        
         <div className="text-center max-w-3xl mx-auto space-y-2.5">
           <h2 className="text-xs font-bold uppercase tracking-wider text-[#C65D32]">
             Core Capabilities
@@ -237,7 +228,7 @@ export default function LandingPage() {
         </div>
 
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-
+          
           <div className="card-interactive p-6 rounded-2xl border border-[#E7E0D8] bg-white shadow-xs hover:border-[#C65D32] transition-colors space-y-3">
             <div className="w-10 h-10 rounded-xl bg-[#FBF4EE] text-[#C65D32] flex items-center justify-center">
               <BookOpen size={20} />
@@ -258,6 +249,184 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* ⬇️⬇️ KEEP YOUR EXISTING CODE FROM HERE DOWN ⬇️⬇️
-              Starting with the third card ("Daily Recall Streaks") and everything after it.
-              Do NOT delete it. Only the part ABOVE this line is replaced. */}
+          <div className="card-interactive p-6 rounded-2xl border border-[#E7E0D8] bg-white shadow-xs hover:border-[#C65D32] transition-colors space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-[#FAF5EF] text-[#7A3216] border border-[#E8B786] flex items-center justify-center">
+              <Flame size={20} className="text-[#C65D32]" />
+            </div>
+            <h4 className="text-base font-bold text-[#222222]">Daily Recall Streaks</h4>
+            <p className="text-xs text-[#706B66] leading-relaxed">
+              Stay motivated with daily streaks, retention velocity metrics, and automated spaced review reminders.
+            </p>
+          </div>
+
+          <div className="card-interactive p-6 rounded-2xl border border-[#E7E0D8] bg-white shadow-xs hover:border-[#C65D32] transition-colors space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-[#FBF4EE] text-[#C65D32] flex items-center justify-center">
+              <Layers size={20} />
+            </div>
+            <h4 className="text-base font-bold text-[#222222]">Domain Glossaries</h4>
+            <p className="text-xs text-[#706B66] leading-relaxed">
+              Interactive terminology with phonetic pronunciations, part-of-speech context, and illustrative examples.
+            </p>
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* 5. THE SCIENCE SECTION (Charcoal & Warm Ivory) */}
+      <section id="science" className="py-20 bg-[#222222] text-[#F7F3ED]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-[#E8B786] text-xs font-bold">
+                <Brain size={14} />
+                <span>Cognitive Neuroscience Foundations</span>
+              </div>
+
+              <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+                Why passive re-reading fails, and active recall wins
+              </h3>
+
+              <p className="text-sm sm:text-base text-[#D8CFC5] leading-relaxed">
+                Highlighting and re-reading textbooks triggers the <em>fluency heuristic</em>—you recognize the words, falsely convincing yourself you understand the concepts.
+              </p>
+
+              <div className="space-y-4 pt-2">
+                <div className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[#C65D32] text-white flex items-center justify-center mt-0.5 shrink-0">
+                    <Check size={12} />
+                  </div>
+                  <p className="text-xs sm:text-sm text-[#D8CFC5]">
+                    <strong className="text-white">Long-Term Potentiation (LTP):</strong> Actively retrieving knowledge triggers calcium influx via NMDA receptors, signaling structural synaptic consolidation.
+                  </p>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[#C65D32] text-white flex items-center justify-center mt-0.5 shrink-0">
+                    <Check size={12} />
+                  </div>
+                  <p className="text-xs sm:text-sm text-[#D8CFC5]">
+                    <strong className="text-white">The Ebbinghaus Forgetting Curve:</strong> Without spaced retrieval, 70% of new information decays within 48 hours. Spaced recall resets the exponential decay rate.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <Link
+                  to="/signup"
+                  className="inline-flex items-center gap-2 text-xs font-bold text-[#E8B786] hover:text-white transition-colors"
+                >
+                  <span>Build your active recall decks now</span>
+                  <ArrowRight size={14} />
+                </Link>
+              </div>
+            </div>
+
+            {/* Retention Comparison Graph */}
+            <div className="bg-[#2D2A28] border border-[#3D3A37] rounded-2xl p-6 sm:p-8 space-y-6">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#E8B786]">
+                1-Week Retention Rate Comparison
+              </h4>
+
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs font-bold">
+                    <span className="text-white">RecallMe (Active Recall & Spaced Testing)</span>
+                    <span className="text-[#E8B786]">88% Retained</span>
+                  </div>
+                  <div className="w-full bg-[#3D3A37] h-2.5 rounded-full overflow-hidden">
+                    <div className="bg-[#C65D32] h-full rounded-full" style={{ width: '88%' }}></div>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs font-semibold">
+                    <span className="text-[#D8CFC5]">Passive Flashcard Review</span>
+                    <span className="text-[#D8CFC5]">42% Retained</span>
+                  </div>
+                  <div className="w-full bg-[#3D3A37] h-2.5 rounded-full overflow-hidden">
+                    <div className="bg-[#E8B786] h-full rounded-full" style={{ width: '42%' }}></div>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs font-semibold">
+                    <span className="text-[#D8CFC5]">Passive Re-reading / Highlighting</span>
+                    <span className="text-[#B93838]">18% Retained</span>
+                  </div>
+                  <div className="w-full bg-[#3D3A37] h-2.5 rounded-full overflow-hidden">
+                    <div className="bg-[#B93838] h-full rounded-full" style={{ width: '18%' }}></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-3 bg-[#222222] rounded-xl border border-[#3D3A37] text-xs text-[#D8CFC5] italic">
+                *Empirical findings consolidated from Roediger & Karpicke (2006) on the testing effect in educational psychology.
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* 6. CALL TO ACTION BANNER */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center">
+        <div className="p-10 sm:p-14 bg-[#222222] rounded-3xl text-white shadow-card space-y-6 border border-[#222222]">
+          
+          <h3 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[#F7F3ED]">
+            Ready to master your hardest subjects?
+          </h3>
+
+          <p className="text-base sm:text-lg text-[#D8CFC5] max-w-xl mx-auto leading-relaxed font-normal">
+            Join thousands of university students, medical candidates, and engineers using RecallMe daily.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
+            <Link
+              to="/signup"
+              className="btn-tactile w-full sm:w-auto px-7 py-3.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white font-bold text-sm shadow-card"
+            >
+              Get Started Free
+            </Link>
+            <Link
+              to="/login"
+              className="btn-tactile w-full sm:w-auto px-7 py-3.5 rounded-xl bg-transparent hover:bg-white/10 text-white font-bold text-sm border border-white/20"
+            >
+              Log In to Account
+            </Link>
+          </div>
+
+        </div>
+      </section>
+
+      {/* 7. FOOTER */}
+      <footer className="border-t border-[#E7E0D8] bg-white py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-[#706B66]">
+          
+          <div className="flex items-center gap-2.5">
+            <div className="w-6 h-6 rounded-lg bg-[#222222] text-[#F7F3ED] flex items-center justify-center font-bold text-xs">
+              R
+            </div>
+            <span className="font-bold text-[#222222] text-sm">RecallMe</span>
+            <span>— Active Recall & Conceptual Mastery</span>
+          </div>
+
+          <div className="flex items-center gap-6 font-semibold">
+            <a href="#features" className="hover:text-[#222222] transition-colors">Features</a>
+            <a href="#how-it-works" className="hover:text-[#222222] transition-colors">How It Works</a>
+            <a href="#science" className="hover:text-[#222222] transition-colors">The Science</a>
+            <Link to="/login" className="hover:text-[#222222] transition-colors">Student Login</Link>
+          </div>
+
+          <div>
+            © {new Date().getFullYear()} RecallMe EdTech. Built for serious learners.
+          </div>
+
+        </div>
+      </footer>
+
+    </div>
+  );
+}
