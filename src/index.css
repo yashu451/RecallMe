@@ -82,6 +82,33 @@
     border-color: #C65D32;
   }
 
+  /* 3D Flashcard Flip utilities */
+  .flashcard-perspective {
+    perspective: 1200px;
+  }
+  .flashcard-inner {
+    position: relative;
+    width: 100%;
+    min-height: 220px;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .flashcard-inner.is-flipped {
+    transform: rotateY(180deg);
+  }
+  .flashcard-front,
+  .flashcard-back {
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .flashcard-back {
+    position: absolute;
+    inset: 0;
+    transform: rotateY(180deg);
+  }
+
   /* Smooth GPU-accelerated progress bar */
   .progress-bar-smooth {
     transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
@@ -170,6 +197,10 @@
   .btn-tactile:active,
   .card-interactive:hover {
     transform: none !important;
+  }
+
+  .flashcard-inner {
+    transition: none !important;
   }
 
   .ambient-orb-1,

@@ -10,12 +10,49 @@ import {
   Search, 
   TrendingUp, 
   ChevronRight, 
-  Calendar, 
   Flame, 
   Zap, 
-  Layers
+  Layers,
+  RotateCw,
+  HelpCircle,
+  Check
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+
+const DAILY_FLASHCARDS = [
+  {
+    id: 'fc-1',
+    subject: 'Database Systems',
+    code: 'CS 145',
+    question: 'What is the main purpose of normalization in DBMS?',
+    answer: 'Normalization decomposes relations to minimize data redundancy and prevent insertion, update, and deletion anomalies while enforcing data integrity (e.g., 1NF, 2NF, 3NF, BCNF).',
+    insight: 'Eliminates duplicate attributes and guarantees structural functional dependencies.'
+  },
+  {
+    id: 'fc-2',
+    subject: 'Distributed Systems',
+    code: 'CS 244B',
+    question: 'Why does the Raft consensus algorithm use randomized election timeouts?',
+    answer: 'Randomized election timeouts (typically 150–300ms) prevent split-vote scenarios where multiple candidate nodes start elections simultaneously and split votes evenly, ensuring a single leader emerges quickly.',
+    insight: 'Elects an unambiguous leader within a few heartbeat intervals.'
+  },
+  {
+    id: 'fc-3',
+    subject: 'Operating Systems',
+    code: 'CS 140',
+    question: 'What is the fundamental difference between a process context switch and a thread context switch?',
+    answer: 'A process switch swaps virtual memory address spaces (updating page table pointers in the CR3 register and invalidating TLB caches), whereas a thread switch only swaps CPU registers, program counter, and stack within the same address space.',
+    insight: 'Thread switches incur significantly lower overhead due to shared memory mapping.'
+  },
+  {
+    id: 'fc-4',
+    subject: 'Computer Networks',
+    code: 'CS 144',
+    question: 'Why does TCP require a three-way handshake instead of a two-way handshake?',
+    answer: 'A three-way handshake (SYN, SYN-ACK, ACK) ensures that both client and server independently verify packet delivery in both directions and synchronize initial sequence numbers (ISNs), preventing delayed duplicate packets from causing phantom sessions.',
+    insight: 'Guarantees reliable bidirectional sequence initialization.'
+  }
+];
 
 export default function HomeDashboard({ 
   topics, 
@@ -27,11 +64,27 @@ export default function HomeDashboard({
   const { currentUser } = useAuth();
   const [quickInput, setQuickInput] = useState('');
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
+  // Flashcard of the Day State
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [cardFeedback, setCardFeedback] = useState(null); // 'got_it' | 'review_again' | null
+
+  const currentCard = DAILY_FLASHCARDS[currentCardIndex];
+
+  const handleNextCard = () => {
+    setIsFlipped(false);
+    setTimeout(() => {
+      setCurrentCardIndex((prev) => (prev + 1) % DAILY_FLASHCARDS.length);
+      setCardFeedback(null);
+    }, 180);
+  };
+
+  const handleGotIt = () => {
+    setCardFeedback('got_it');
+  };
+
+  const handleReviewAgain = () => {
+    setCardFeedback('review_again');
   };
 
   const handleQuickSubmit = (e) => {
@@ -44,20 +97,14 @@ export default function HomeDashboard({
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
       
-      {/* 1. Header & Greeting */}
+      {/* 1. Clean Header Area */}
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E7E0D8] pb-6">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs font-bold text-[#C65D32] uppercase tracking-wider">
-            <Calendar size={14} />
-            <span>Academic Term 2026</span>
-            <span className="text-[#E7E0D8]">•</span>
-            <span className="text-[#706B66] font-medium">Active Recall Rhythm</span>
-          </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#222222] tracking-tight">
-            {getGreeting()}, {currentUser?.name?.split(' ')[0] || 'Alex'} 👋
+            Your Learning Space
           </h1>
           <p className="text-sm text-[#706B66] max-w-xl leading-relaxed">
-            Ready to turn today’s lectures and reading into permanent retention? Let's verify your conceptual recall.
+            Turn what you learn into knowledge you remember.
           </p>
         </div>
 
@@ -119,7 +166,188 @@ export default function HomeDashboard({
         </form>
       </section>
 
-      {/* 3. Learning Activity & Retention Progress */}
+      {/* 3. Interactive Flashcard of the Day */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between border-b border-[#E7E0D8] pb-2">
+          <div className="space-y-0.5">
+            <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#C65D32]">
+              DAILY RECALL
+            </div>
+            <h2 className="text-sm sm:text-base font-bold text-[#222222] tracking-tight flex items-center gap-2">
+              <Sparkles size={15} className="text-[#C65D32]" />
+              <span>Flashcard of the Day</span>
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono text-[#706B66] hidden sm:inline">
+              Card {currentCardIndex + 1} of {DAILY_FLASHCARDS.length}
+            </span>
+            <button
+              type="button"
+              onClick={handleNextCard}
+              className="btn-tactile inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#E7E0D8] bg-white hover:bg-[#FAF8F5] text-xs font-bold text-[#252525] shadow-xs"
+              title="Cycle to next study flashcard"
+            >
+              <span>Next Card</span>
+              <ChevronRight size={14} className="text-[#706B66]" />
+            </button>
+          </div>
+        </div>
+
+        {/* 3D Flip Card Container */}
+        <div className="flashcard-perspective w-full">
+          <div className={`flashcard-inner rounded-2xl ${isFlipped ? 'is-flipped' : ''}`}>
+            
+            {/* FRONT FACE */}
+            <div className="flashcard-front bg-white border border-[#E7E0D8] rounded-2xl p-6 sm:p-7 shadow-card flex flex-col justify-between space-y-5 card-interactive">
+              
+              {/* Front Top Row */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-[#FBF4EE] border border-[#ECD0C0] text-[#C65D32] flex items-center justify-center shadow-xs">
+                    <HelpCircle size={16} />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-[#222222]">
+                      {currentCard.subject}
+                    </span>
+                    <span className="text-[11px] font-mono text-[#706B66] ml-2 bg-[#FAF8F5] px-1.5 py-0.5 rounded border border-[#E7E0D8]">
+                      {currentCard.code}
+                    </span>
+                  </div>
+                </div>
+
+                <span className="text-[11px] font-mono text-[#706B66] sm:hidden">
+                  {currentCardIndex + 1}/{DAILY_FLASHCARDS.length}
+                </span>
+              </div>
+
+              {/* Front Question */}
+              <div className="space-y-1.5 py-1">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-[#706B66]">
+                  Active Retrieval Prompt:
+                </div>
+                <h3 className="text-base sm:text-lg font-bold text-[#222222] leading-snug">
+                  {currentCard.question}
+                </h3>
+              </div>
+
+              {/* Front Action Row */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-[#E7E0D8]">
+                <span className="text-xs text-[#706B66]">
+                  Test your recall before flipping to inspect the verified answer.
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() => setIsFlipped(true)}
+                  className="btn-tactile inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold shadow-xs self-start sm:self-auto"
+                >
+                  <RotateCw size={13} />
+                  <span>Reveal Answer</span>
+                </button>
+              </div>
+
+            </div>
+
+            {/* BACK FACE */}
+            <div className="flashcard-back bg-white border border-[#E7E0D8] rounded-2xl p-6 sm:p-7 shadow-card flex flex-col justify-between space-y-5">
+              
+              {/* Back Top Row */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-[#EDF5F1] border border-[#C0DCD0] text-[#38765C] flex items-center justify-center shadow-xs">
+                    <CheckCircle2 size={16} />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-[#38765C] uppercase tracking-wider">
+                      Verified Concept Solution
+                    </span>
+                    <span className="text-[11px] text-[#706B66] ml-2">
+                      ({currentCard.subject})
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsFlipped(false)}
+                  className="btn-tactile text-xs text-[#706B66] hover:text-[#222222] flex items-center gap-1 font-semibold"
+                >
+                  <RotateCw size={12} />
+                  <span>Flip to question</span>
+                </button>
+              </div>
+
+              {/* Back Answer */}
+              <div className="space-y-2 py-1">
+                <p className="text-xs sm:text-sm text-[#252525] leading-relaxed font-sans">
+                  {currentCard.answer}
+                </p>
+                {currentCard.insight && (
+                  <div className="text-xs text-[#706B66] bg-[#FAF8F5] p-2.5 rounded-xl border border-[#E7E0D8] font-mono">
+                    <strong className="text-[#222222] font-sans">Key Insight:</strong> {currentCard.insight}
+                  </div>
+                )}
+              </div>
+
+              {/* Back Action Row: Got It / Review Again */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-[#E7E0D8]">
+                <div>
+                  {cardFeedback === 'got_it' && (
+                    <span className="text-xs font-bold text-[#38765C] flex items-center gap-1">
+                      <Check size={14} />
+                      <span>Retained! Marked as understood.</span>
+                    </span>
+                  )}
+                  {cardFeedback === 'review_again' && (
+                    <span className="text-xs font-bold text-[#C65D32] flex items-center gap-1">
+                      <RotateCcw size={14} />
+                      <span>Queued for upcoming spaced repetition review.</span>
+                    </span>
+                  )}
+                  {!cardFeedback && (
+                    <span className="text-xs text-[#706B66]">
+                      How durable was your recall of this concept?
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <button
+                    type="button"
+                    onClick={handleReviewAgain}
+                    className={`btn-tactile px-4 py-2 rounded-xl text-xs font-bold border transition-colors ${
+                      cardFeedback === 'review_again'
+                        ? 'bg-[#FBF4EE] border-[#C65D32] text-[#C65D32]'
+                        : 'bg-white border-[#E7E0D8] text-[#706B66] hover:text-[#222222] hover:bg-[#FAF8F5]'
+                    }`}
+                  >
+                    Review Again
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleGotIt}
+                    className={`btn-tactile px-4 py-2 rounded-xl text-xs font-bold transition-colors shadow-xs ${
+                      cardFeedback === 'got_it'
+                        ? 'bg-[#38765C] text-white'
+                        : 'bg-[#222222] hover:bg-[#333333] text-white'
+                    }`}
+                  >
+                    Got it
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Learning Activity & Retention Progress */}
       <section className="space-y-3">
         <div className="flex items-center justify-between border-b border-[#E7E0D8] pb-2">
           <h2 className="text-xs font-bold uppercase tracking-wider text-[#706B66] flex items-center gap-1.5">
