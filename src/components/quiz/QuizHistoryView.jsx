@@ -61,7 +61,9 @@ export default function QuizHistoryView({
           <div className="text-2xl sm:text-3xl font-extrabold text-[#222222]">
             {avgRetention}%
           </div>
-          <div className="text-xs text-[#38765C] font-bold">Target &gt; 80% achieved</div>
+          <div className="text-xs text-[#38765C] font-bold">
+            {totalSessions > 0 ? (avgRetention >= 80 ? 'Target > 80% achieved' : 'Keep practicing!') : 'Complete a quiz to track'}
+          </div>
         </div>
 
         <div className="p-5 bg-white border border-[#E7E0D8] rounded-2xl shadow-subtle space-y-1">

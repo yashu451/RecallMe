@@ -3,15 +3,15 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const AuthContext = createContext(null);
 
 const DEFAULT_USER = {
-  id: 'user-alex-1',
-  name: 'Alex Chen',
-  email: 'alex.chen@stanford.edu',
-  avatar: 'AC',
-  streak: 7,
-  dailyGoal: 5,
-  institution: 'Stanford University',
-  joinedDate: 'October 2026',
-  retentionAverage: 88,
+  id: 'user-new',
+  name: 'Learner',
+  email: 'learner@recallme.app',
+  avatar: 'ME',
+  streak: 0,
+  dailyGoal: 3,
+  institution: '',
+  joinedDate: 'Today',
+  retentionAverage: 0,
   notifications: true,
   spacedInterval: '48h'
 };

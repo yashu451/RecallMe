@@ -42,25 +42,20 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
     setText(sample.text);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!text.trim()) return;
 
     setIsGenerating(true);
-    setGenerationStep('Extracting core principles & hierarchical sections...');
+    setGenerationStep('Contacting RecallMe AI Engine & parsing concepts...');
 
-    setTimeout(() => {
-      setGenerationStep('Isolating domain invariants & terminology...');
-    }, 600);
-
-    setTimeout(() => {
-      setGenerationStep('Formulating active recall questions & explanations...');
-    }, 1200);
-
-    setTimeout(() => {
+    try {
+      await onGenerate(text, title, options, subject);
+    } catch (err) {
+      console.error('Generation error:', err);
+    } finally {
       setIsGenerating(false);
-      onGenerate(text, title, options);
-    }, 1800);
+    }
   };
 
   return (

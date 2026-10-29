@@ -18,7 +18,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 
 export default function HomeDashboard({ 
-  topics, 
+  topics = [], 
   onSelectTopic, 
   onStartQuiz, 
   onCreateFromQuickInput 
@@ -26,6 +26,31 @@ export default function HomeDashboard({
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [quickInput, setQuickInput] = useState('');
+
+  // 1. Dynamic Mean Retention Score
+  const studiedTopics = (topics || []).filter(t => (t.masteryScore || 0) > 0);
+  const meanScore = studiedTopics.length > 0
+    ? Math.round(studiedTopics.reduce((acc, t) => acc + (t.masteryScore || 0), 0) / studiedTopics.length)
+    : 0;
+
+  // 2. Dynamic Active Concepts Mastered
+  const totalConcepts = (topics || []).reduce((acc, t) => acc + (t.keywords?.length || 0), 0);
+  const uniqueDomains = new Set((topics || []).map(t => t.subject).filter(Boolean)).size;
+  const recentConcept = topics?.[0]?.keywords?.[0]?.term || (topics?.[0]?.title ? topics[0].title : 'None yet');
+
+  // 3. Dynamic 7-day recall rhythm (past 7 days ending today)
+  const dayLabels = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const todayDay = new Date().getDay();
+  const rhythmDays = Array.from({ length: 7 }, (_, i) => {
+    const dIdx = (todayDay - 6 + i + 7) % 7;
+    const isToday = i === 6;
+    const isActive = isToday ? (topics && topics.length > 0) : false;
+    return {
+      day: dayLabels[dIdx],
+      active: isActive,
+      today: isToday
+    };
+  });
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -60,7 +85,7 @@ export default function HomeDashboard({
             <span className="text-[#706B66] font-medium">Active Recall Rhythm</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#222222] tracking-tight">
-            {getGreeting()}, {currentUser?.name?.split(' ')[0] || 'Alex'} 👋
+            {getGreeting()}, {currentUser?.name?.split(' ')[0] || 'Learner'} 👋
           </h1>
           <p className="text-sm text-[#706B66] max-w-xl leading-relaxed">
             Ready to turn today’s lectures and reading into permanent retention? Let's verify your conceptual recall.
@@ -74,10 +99,10 @@ export default function HomeDashboard({
           </div>
           <div>
             <div className="text-xs font-bold text-[#7A3216] flex items-center gap-1">
-              <span>{currentUser?.streak || 7} Day Streak!</span>
+              <span>{currentUser?.streak ?? 0} Day Streak</span>
             </div>
             <div className="text-[11px] text-[#706B66] font-medium">
-              1 review due today to maintain
+              {(currentUser?.streak ?? 0) > 0 ? 'Keep the momentum going!' : 'Study your first topic today!'}
             </div>
           </div>
         </div>
@@ -148,36 +173,38 @@ export default function HomeDashboard({
             <span>Retention Velocity & Progress</span>
           </h2>
           <span className="text-xs text-[#706B66] font-medium">
-            Weekly Target: <strong className="text-[#C65D32] font-bold">4 / 5 Topics</strong>
+            Weekly Target: <strong className="text-[#C65D32] font-bold">{topics.length} / 5 Topics</strong>
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
-          {/* Stat 1 */}
+          {/* Stat 1: Mean Retention Score */}
           <div className="p-4 bg-white border border-[#E7E0D8] rounded-xl shadow-subtle space-y-2">
             <div className="text-[11px] font-bold text-[#706B66] uppercase tracking-wider">
               Mean Retention Score
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-extrabold text-[#222222]">88.3%</span>
-              <span className="text-xs text-[#38765C] font-bold">↑ 3.2% vs last week</span>
+              <span className="text-3xl font-extrabold text-[#222222]">{meanScore}%</span>
+              <span className="text-xs text-[#38765C] font-bold">
+                {studiedTopics.length > 0 ? `${studiedTopics.length} topics tested` : 'Take a quiz to score'}
+              </span>
             </div>
             <div className="w-full bg-[#FAF8F5] border border-[#E7E0D8] h-2 rounded-full overflow-hidden">
-              <div className="bg-[#C65D32] h-full rounded-full" style={{ width: '88%' }}></div>
+              <div className="bg-[#C65D32] h-full rounded-full transition-all duration-500" style={{ width: `${meanScore}%` }}></div>
             </div>
           </div>
 
-          {/* Stat 2 */}
+          {/* Stat 2: Active Concepts Mastered */}
           <div className="p-4 bg-white border border-[#E7E0D8] rounded-xl shadow-subtle space-y-2">
             <div className="text-[11px] font-bold text-[#706B66] uppercase tracking-wider">
               Active Concepts Mastered
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-extrabold text-[#222222]">24</span>
-              <span className="text-xs text-[#706B66] font-medium">across 4 academic domains</span>
+              <span className="text-3xl font-extrabold text-[#222222]">{totalConcepts}</span>
+              <span className="text-xs text-[#706B66] font-medium">across {uniqueDomains} domain{uniqueDomains === 1 ? '' : 's'}</span>
             </div>
             <p className="text-[11px] text-[#706B66] truncate">
-              Recent: Scaled Dot-Product Attention
+              Recent: {recentConcept}
             </p>
           </div>
 
@@ -187,26 +214,20 @@ export default function HomeDashboard({
               7-Day Recall Rhythm
             </div>
             <div className="flex items-center justify-between gap-1 pt-1">
-              {[
-                { day: 'F', active: true },
-                { day: 'S', active: true },
-                { day: 'S', active: true },
-                { day: 'M', active: true },
-                { day: 'T', active: true },
-                { day: 'W', active: true },
-                { day: 'T', active: true, today: true },
-              ].map((item, i) => (
+              {rhythmDays.map((item, i) => (
                 <div key={i} className="flex flex-col items-center gap-1">
                   <div
                     className={`w-6 h-6 rounded-lg flex items-center justify-center text-[11px] font-bold ${
-                      item.today
+                      item.today && item.active
                         ? 'bg-[#C65D32] text-white shadow-xs'
                         : item.active
                         ? 'bg-[#222222] text-[#F7F3ED] font-semibold'
-                        : 'bg-[#F7F3ED] text-[#706B66] border border-[#E7E0D8]'
+                        : item.today
+                        ? 'bg-[#FAF5EF] text-[#C65D32] border border-[#ECD0C0]'
+                        : 'bg-[#F7F3ED] text-[#706B66]/40 border border-[#E7E0D8]'
                     }`}
                   >
-                    ✓
+                    {item.active ? '✓' : '•'}
                   </div>
                   <span className={`text-[10px] font-semibold ${item.today ? 'text-[#C65D32]' : 'text-[#706B66]'}`}>
                     {item.day}
@@ -237,89 +258,103 @@ export default function HomeDashboard({
           </button>
         </div>
 
-        {/* Topics List Card */}
-        <div className="border border-[#E7E0D8] rounded-2xl bg-white divide-y divide-[#E7E0D8] overflow-hidden shadow-card">
-          {topics.slice(0, 4).map((topic) => (
-            <div 
-              key={topic.id}
-              className="p-5 hover:bg-[#FAF8F5] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
-            >
-              {/* Left Column: Title & Subject */}
-              <div className="space-y-1 sm:max-w-md">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#FBF4EE] text-[#C65D32] border border-[#ECD0C0]">
-                    {topic.subject}
-                  </span>
-                  <span className="text-xs text-[#706B66] font-mono">
-                    {topic.readTime}
-                  </span>
-                  <span className="text-[#E7E0D8]">•</span>
-                  <span className="text-xs text-[#706B66]">
-                    Studied {topic.lastStudied}
-                  </span>
-                </div>
-
-                <h3 
-                  onClick={() => {
-                    onSelectTopic(topic);
-                    navigate(`/study/${topic.id}`);
-                  }}
-                  className="text-base font-bold text-[#222222] group-hover:text-[#C65D32] transition-colors cursor-pointer"
-                >
-                  {topic.title}
-                </h3>
-
-                <p className="text-xs text-[#706B66] line-clamp-1 leading-relaxed">
-                  {topic.summary}
-                </p>
-              </div>
-
-              {/* Right Column: Mastery & Quick Actions */}
-              <div className="flex items-center justify-between sm:justify-end gap-5 pt-1 sm:pt-0">
-                {/* Mastery Bar */}
-                <div className="text-left sm:text-right min-w-[95px]">
-                  <div className="text-[10px] uppercase tracking-wider text-[#706B66] font-bold">
-                    Mastery
-                  </div>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <div className="w-16 bg-[#FAF8F5] border border-[#E7E0D8] h-2 rounded-full overflow-hidden">
-                      <div 
-                        className="bg-[#C65D32] h-full rounded-full" 
-                        style={{ width: `${topic.masteryScore}%` }}
-                      ></div>
-                    </div>
-                    <span className="font-mono text-xs text-[#222222] font-bold">
-                      {topic.masteryScore}%
+        {/* Topics List Card or Empty State */}
+        {topics.length === 0 ? (
+          <div className="p-10 text-center space-y-3 bg-white border border-[#E7E0D8] rounded-2xl shadow-card">
+            <div className="w-12 h-12 mx-auto rounded-2xl bg-[#FAF5EF] text-[#C65D32] flex items-center justify-center">
+              <BookOpen size={24} />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold text-[#222222]">No study topics yet</h3>
+              <p className="text-xs text-[#706B66] max-w-sm mx-auto">
+                Paste what you learned today in the box above to generate your first AI study set!
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="border border-[#E7E0D8] rounded-2xl bg-white divide-y divide-[#E7E0D8] overflow-hidden shadow-card">
+            {topics.slice(0, 4).map((topic) => (
+              <div 
+                key={topic.id}
+                className="p-5 hover:bg-[#FAF8F5] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
+              >
+                {/* Left Column: Title & Subject */}
+                <div className="space-y-1 sm:max-w-md">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#FBF4EE] text-[#C65D32] border border-[#ECD0C0]">
+                      {topic.subject}
+                    </span>
+                    <span className="text-xs text-[#706B66] font-mono">
+                      {topic.readTime}
+                    </span>
+                    <span className="text-[#E7E0D8]">•</span>
+                    <span className="text-xs text-[#706B66]">
+                      Studied {topic.lastStudied}
                     </span>
                   </div>
-                </div>
 
-                {/* Action Buttons */}
-                <div className="flex items-center gap-2">
-                  <button
+                  <h3 
                     onClick={() => {
                       onSelectTopic(topic);
                       navigate(`/study/${topic.id}`);
                     }}
-                    className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#252525] hover:text-[#222222] bg-[#F7F3ED] hover:bg-[#EFE9DF] border border-[#E7E0D8] transition-colors"
+                    className="text-base font-bold text-[#222222] group-hover:text-[#C65D32] transition-colors cursor-pointer"
                   >
-                    Notes
-                  </button>
-                  <button
-                    onClick={() => {
-                      onStartQuiz(topic);
-                      navigate(`/quiz/${topic.id}`);
-                    }}
-                    className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] transition-colors flex items-center gap-1 shadow-xs"
-                  >
-                    <span>Quiz</span>
-                    <ArrowRight size={12} />
-                  </button>
+                    {topic.title}
+                  </h3>
+
+                  <p className="text-xs text-[#706B66] line-clamp-1 leading-relaxed">
+                    {topic.summary}
+                  </p>
+                </div>
+
+                {/* Right Column: Mastery & Quick Actions */}
+                <div className="flex items-center justify-between sm:justify-end gap-5 pt-1 sm:pt-0">
+                  {/* Mastery Bar */}
+                  <div className="text-left sm:text-right min-w-[95px]">
+                    <div className="text-[10px] uppercase tracking-wider text-[#706B66] font-bold">
+                      Mastery
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <div className="w-16 bg-[#FAF8F5] border border-[#E7E0D8] h-2 rounded-full overflow-hidden">
+                        <div 
+                          className="bg-[#C65D32] h-full rounded-full" 
+                          style={{ width: `${topic.masteryScore}%` }}
+                        ></div>
+                      </div>
+                      <span className="font-mono text-xs text-[#222222] font-bold">
+                        {topic.masteryScore}%
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        onSelectTopic(topic);
+                        navigate(`/study/${topic.id}`);
+                      }}
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#252525] hover:text-[#222222] bg-[#F7F3ED] hover:bg-[#EFE9DF] border border-[#E7E0D8] transition-colors"
+                    >
+                      Notes
+                    </button>
+                    <button
+                      onClick={() => {
+                        onStartQuiz(topic);
+                        navigate(`/quiz/${topic.id}`);
+                      }}
+                      className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] transition-colors flex items-center gap-1 shadow-xs"
+                    >
+                      <span>Quiz</span>
+                      <ArrowRight size={12} />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
     </div>
