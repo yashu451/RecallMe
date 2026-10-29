@@ -1,57 +1,37 @@
-# RecallMe — Active Recall & Structured Learning Platform
+# RecallMe — AI-Powered Active Recall & EdTech SaaS Platform
 
-RecallMe is a production-grade, editorial EdTech web application designed for students and researchers. Drawing aesthetic and functional inspiration from Notion, Linear, and modern editorial publications, RecallMe converts complex reading materials, lecture transcripts, and syllabus excerpts into structured study decks and active recall quizzes.
+RecallMe is a modern, full-featured EdTech web application inspired by the UX precision of Notion and Linear combined with the habit-forming engagement mechanics of Duolingo. Built on cognitive neuroscience principles (Long-Term Potentiation, the Ebbinghaus forgetting curve, and the testing effect), RecallMe transforms lecture transcripts, syllabus chapters, and research papers into structured study decks and active recall quizzes.
 
-## Key Design Principles
+## Key Design & UX Features
 
-- **Warm Editorial Aesthetic:** Warm off-white background (`#FAF9F5`), crisp charcoal typography, and deep indigo (`#312E81`) used sparingly as an intentional accent.
-- **Visual Restraint:** Replaces generic neon cards, emojis, and rainbow gradients with clean 1px hairline borders, high-legibility serif and sans typography, and structured content hierarchy.
-- **Cognitive Science Foundations:** Built around the principles of Long-Term Potentiation (LTP), the Ebbinghaus forgetting curve, and the testing effect—facilitating active retrieval over passive re-reading.
+- **Modern SaaS Visual Style:** Pure white surfaces (`bg-white`), dark navy typography (`#0F172A`), and vibrant indigo/blue accents (`#4F46E5`, `#2563EB`).
+- **Typography:** Modern grotesque sans-serif pairing with **Plus Jakarta Sans** and **Inter**. The outdated beige theme, serif fonts, and permanent sidebar have been replaced.
+- **Top Navigation Bar:** Polished global header featuring brand mark, dynamic contextual links, Duolingo-style streak indicator (`🔥 7 Days`), quick note creator, and user profile avatar dropdown.
+- **Interactive Gamification:** Daily streak tracker, retention velocity meters, and spaced repetition intervals.
 
-## Application Architecture & Pages
+## Application Architecture & Routes
 
-1. **Home Dashboard (`HomeDashboard.jsx`):**
-   - Contextual greeting with temporal relevance.
-   - Prominent *"What did you learn today?"* rapid input box with prompt chips and direct synthesis.
-   - Compact learning activity tracker with 7-day recall rhythm, retention average, and reviewed concept metrics.
-   - Recently studied topics table with direct actions for review and testing.
-
-2. **Create View (`CreateView.jsx`):**
-   - Distraction-free editor for typing or pasting raw lecture notes, research excerpts, and articles.
-   - Realistic sample presets (Cellular Respiration, Quantum Computing, Taylor Rule).
-   - Custom generation toggles for Structured Notes, Key Concepts, Glossary & Definitions, and Active Recall Quizzes.
-
-3. **Study Material Reader (`StudyMaterialView.jsx`):**
-   - Clean reading layout with tabbed navigation: *Structured Notes*, *Key Concepts*, *Glossary & Definitions*, and *Quiz Questions Preview*.
-   - Executive synthesis callout and section-by-section analysis.
-   - Interactive term inspector with popover definitions.
-   - One-click Markdown export and bookmarking.
-
-4. **Recall Quiz (`RecallQuizView.jsx`):**
-   - Focused, single-question testing interface.
-   - Clear multiple-choice options with keyboard shortcuts (`1-4` / `A-D`, `Enter`).
-   - Progress bar, timer, and question counters.
-
-5. **Session Results (`QuizResultsView.jsx`):**
-   - Accurate score summary, retention percentage, and qualitative mastery feedback.
-   - Item-by-item answer review highlighting user selections, correct answers, and conceptual rationales.
-   - Direct retry and study note review actions.
-
-6. **My Library (`LibraryView.jsx`):**
-   - Searchable repository with fuzzy keyword search across titles, summaries, and tags.
-   - Academic domain filter pills and multi-criteria sorting (Recency, Retention Score, Alphabetical).
-   - Favorite starring and topic deletion.
-
-7. **Quiz History (`QuizHistoryView.jsx`):**
-   - Historical records of completed recall sessions, average retention stats, and retake shortcuts.
+| Route | View | Description |
+| :--- | :--- | :--- |
+| `/` | **Landing Page** | Top navigation, hero section with interactive product preview, 3-step workflow, core feature grid, cognitive science retention comparison, call-to-action banner, and footer. |
+| `/signup` | **Signup** | Name, university/study email, password, confirm password, live password strength meter, validation, and login link. |
+| `/login` | **Login** | Email, password, show/hide password toggle, forgot password modal with reset link flow, and one-click demo login. |
+| `/dashboard` | **Dashboard** | Personalized greeting, Duolingo-style streak banner, *"What did you learn today?"* content input, recent topics table with mastery bars, and retention velocity metrics. |
+| `/create` | **Create** | Distraction-free editor with word and reading-time counter, pre-configured academic samples, generation checkboxes, and multi-stage synthesis progress indicator. |
+| `/study/:id` | **Study Material** | Tabbed layout (*Structured Notes*, *Key Concepts*, *Glossary & Definitions*, *Quiz Preview*), interactive keyword definition popover, and one-click Markdown export. |
+| `/quiz/:id` | **Recall Quiz** | Focused one-question-at-a-time testing layout, progress bar, timer, lettered options (`A-D`), and full keyboard shortcut support (`1-4`, `A-D`, `Enter`). |
+| `/results` | **Results** | Retention score summary, qualitative mastery feedback, item-by-item answer review with detailed rationales, and retry actions. |
+| `/library` | **My Library** | Searchable study repository with instant keyword filtering, subject domain pills, multi-criteria sorting (Recency, Retention score, Alphabetical), star bookmarking, and deletion. |
+| `/history` | **Quiz History** | Historical record of completed quiz sessions, aggregate retention statistics, and retake shortcuts. |
 
 ## Technology Stack
 
 - **Framework:** React 18
-- **Bundler:** Vite 5
-- **Styling:** Tailwind CSS 3 with custom editorial typography and warm palette
+- **Routing:** React Router v6 (`react-router-dom`)
+- **Styling:** Tailwind CSS 3 (modern white, slate & indigo palette)
 - **Icons:** Lucide React
-- **Fonts:** Plus Jakarta Sans & Newsreader (via Google Fonts)
+- **Fonts:** Plus Jakarta Sans & Inter (via Google Fonts)
+- **Bundler:** Vite 5
 
 ## Getting Started
 
@@ -62,6 +42,6 @@ npm install
 # Start development server
 npm run dev
 
-# Build for production
+# Run production build
 npm run build
 ```
