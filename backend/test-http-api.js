@@ -92,6 +92,14 @@ async function run() {
   const attemptData = await attemptRes.json();
   console.log('✓ Quiz attempt recorded! Score:', attemptData.score + '/' + attemptData.totalQuestions);
 
+  // Clean up all test artifacts so database stays 100% clean for the user
+  console.log('\n--- Cleaning up test artifacts ---');
+  await fetch(`http://127.0.0.1:5000/api/topics/${genData.id}`, { method: 'DELETE' });
+  const { dbRun } = await import('./database/db.js');
+  await dbRun('DELETE FROM quiz_attempts WHERE topic_id = ?', [genData.id]);
+  await dbRun('DELETE FROM users WHERE email = ?', [testEmail]);
+  console.log('✓ Cleaned up test data. User database remains pristine.');
+
   console.log('\n======================================================');
   console.log('   ALL AUTH & WORKFLOW TESTS PASSED WITH 100%!        ');
   console.log('======================================================\n');
