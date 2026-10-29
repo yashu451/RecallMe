@@ -283,17 +283,31 @@ export function generateStudyMaterialFromText(rawText, userTitle = "", options =
   // Trim or expand quiz to requested question count
   const finalQuiz = quiz.slice(0, questionCount);
 
+  let inferredSubject = "General Study";
+  const textLower = cleanText.toLowerCase();
+  if (textLower.match(/algorithm|stack|queue|tree|graph|binary|runtime|complexity|memory|cpu|cache|thread|process|database|sql|acid|query|socket|http|network/)) {
+    inferredSubject = "Computer Science";
+  } else if (textLower.match(/cell|protein|enzyme|chemiosmosis|dna|rna|gene|membrane|mitochondria|atp|respiration/)) {
+    inferredSubject = "Biochemistry & Life Sciences";
+  } else if (textLower.match(/inflation|market|taylor rule|rate|monetary|central bank|equilibrium|gdp|capital|finance/)) {
+    inferredSubject = "Economics & Finance";
+  } else if (textLower.match(/quantum|physics|electron|thermodynamics|wave|particle|mechanics|relativity/)) {
+    inferredSubject = "Physics";
+  } else if (textLower.match(/neuron|synapse|plasticity|cortex|cognitive|memory|brain|perception/)) {
+    inferredSubject = "Cognitive Neuroscience";
+  }
+
   return {
     id: "topic-" + Date.now(),
     title: title,
-    subject: "Self-Directed Study",
-    subjectCode: "NOTE-" + Math.floor(100 + Math.random() * 900),
+    subject: inferredSubject,
+    subjectCode: inferredSubject.slice(0, 3).toUpperCase() + "-" + Math.floor(100 + Math.random() * 900),
     readTime: readTime,
     createdAt: "Just now",
     lastStudied: "Just now",
     masteryScore: 0,
     isStarred: false,
-    tags: ["Custom Notes", "Active Recall", "Synthesized"],
+    tags: [inferredSubject, "Active Recall", "Synthesized"],
     summary: takeaways[0] || (cleanText.slice(0, 150) + "..."),
     sourceExcerpt: cleanText.slice(0, 400) + (cleanText.length > 400 ? "..." : ""),
     sections: sections,

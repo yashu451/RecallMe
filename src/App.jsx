@@ -69,6 +69,7 @@ function StudyRouteWrapper({ topics, onStartQuiz, onToggleStar, onSaveTopic }) {
   }, [id, stateTopic, foundTopic]);
 
   const activeTopic = stateTopic || foundTopic || fetchedTopic || null;
+  // A note is considered saved ONLY if it exists in the fetched backend topics array
   const isSaved = Boolean(activeTopic && topics.some(t => t.id === activeTopic.id));
 
   return (
@@ -119,20 +120,25 @@ function AppContent() {
   // Fetch live data from backend SQLite on mount and when currentUser changes
   useEffect(() => {
     async function loadBackendData() {
-      const backendTopics = await fetchTopics();
-      if (backendTopics && backendTopics.length > 0) {
-        setTopics(backendTopics);
-        setActiveTopicId(backendTopics[0].id);
-      } else {
-        setTopics([]);
-        setActiveTopicId(null);
+      try {
+        const backendTopics = await fetchTopics();
+        if (Array.isArray(backendTopics)) {
+          setTopics(backendTopics);
+          if (backendTopics.length > 0) {
+            setActiveTopicId(backendTopics[0].id);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load topics from backend:', err);
       }
 
-      const backendHistory = await fetchQuizHistory();
-      if (backendHistory && backendHistory.length > 0) {
-        setQuizHistory(backendHistory);
-      } else {
-        setQuizHistory([]);
+      try {
+        const backendHistory = await fetchQuizHistory();
+        if (Array.isArray(backendHistory)) {
+          setQuizHistory(backendHistory);
+        }
+      } catch (err) {
+        console.error('Failed to load quiz history from backend:', err);
       }
     }
     loadBackendData();
@@ -187,8 +193,8 @@ function AppContent() {
   };
 
   // Generate study material (does NOT auto-save to database)
-  const handleGenerate = async (rawText, userTitle = '', subject = 'General Science', options = {}) => {
-    const generated = await generateStudyMaterial(rawText, userTitle, subject, options);
+  const handleGenerate = async (rawText, userTitle = '', options = {}) => {
+    const generated = await generateStudyMaterial(rawText, userTitle, '', options);
     setQuickInputDraft('');
     return generated;
   };
@@ -196,13 +202,14 @@ function AppContent() {
   // Save generated topic to My Library (persists to backend SQLite database)
   const handleSaveTopic = async (topicToSave) => {
     const saved = await persistTopic(topicToSave);
+    const resolved = saved || topicToSave;
     setTopics(prev => {
-      const exists = prev.some(t => t.id === saved.id);
+      const exists = prev.some(t => t.id === resolved.id);
       if (exists) return prev;
-      return [saved, ...prev];
+      return [resolved, ...prev];
     });
-    setActiveTopicId(saved.id);
-    return saved;
+    setActiveTopicId(resolved.id);
+    return resolved;
   };
 
   const handleToggleStar = async (topicId) => {
@@ -270,8 +277,8 @@ function AppContent() {
               <ProtectedRoute>
                 <CreateView 
                   initialText={quickInputDraft}
-                  onGenerate={async (rawText, title, options, subject) => {
-                    const created = await handleGenerate(rawText, title, subject, options);
+                  onGenerate={async (rawText, title, options) => {
+                    const created = await handleGenerate(rawText, title, options);
                     navigate(`/study/${created.id}`, { state: { topic: created, isNew: true } });
                   }}
                   onCancel={() => navigate('/dashboard')}

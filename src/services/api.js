@@ -71,7 +71,7 @@ export async function checkBackendHealth() {
  * Generate study materials without auto-saving to SQLite database.
  * Notes are saved to SQLite only when the user explicitly clicks "Save to My Library".
  */
-export async function generateStudyMaterial(text, title = '', subject = 'General Science', options = {}) {
+export async function generateStudyMaterial(text, title = '', subject = '', options = {}) {
   const userId = getActiveUserId();
   const saveToDb = Boolean(options && options.saveToDb);
 
@@ -120,9 +120,9 @@ export async function fetchTopics() {
       return await res.json();
     }
   } catch (err) {
-    console.warn('[API] Could not fetch topics from backend, using local state.');
+    console.warn('[API] Could not fetch topics from backend:', err.message);
   }
-  return null;
+  return [];
 }
 
 export async function fetchTopicById(id) {
@@ -141,23 +141,22 @@ export async function fetchTopicById(id) {
 
 export async function persistTopic(topic) {
   const userId = getActiveUserId();
-  try {
-    const res = await fetch(`${API_BASE_URL}/topics`, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        ...(userId ? { 'x-user-id': userId } : {})
-      },
-      body: JSON.stringify({ ...topic, userId: topic.userId || userId }),
-      signal: AbortSignal.timeout(3000)
-    });
-    if (res.ok) {
-      return await res.json();
-    }
-  } catch (err) {
-    console.warn('[API] Could not save topic to backend SQLite:', err.message);
+  const res = await fetch(`${API_BASE_URL}/topics`, {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/json',
+      ...(userId ? { 'x-user-id': userId } : {})
+    },
+    body: JSON.stringify({ ...topic, userId: topic.userId || userId }),
+    signal: AbortSignal.timeout(6000)
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Failed to save study notes to backend database.');
   }
-  return topic;
+
+  return await res.json();
 }
 
 export async function toggleTopicStarBackend(topicId) {
@@ -204,7 +203,7 @@ export async function fetchQuizHistory() {
   } catch (err) {
     console.warn('[API] Could not fetch quiz history from backend, using local state.');
   }
-  return null;
+  return [];
 }
 
 export async function recordQuizAttempt(attempt) {

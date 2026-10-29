@@ -16,7 +16,8 @@ import {
   Info, 
   X,
   BookmarkPlus,
-  Loader2
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 
 export default function StudyMaterialView({ 
@@ -35,6 +36,7 @@ export default function StudyMaterialView({
   const [saving, setSaving] = useState(false);
   const [savedLocal, setSavedLocal] = useState(isSaved);
   const [saveToast, setSaveToast] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   // If loading skeleton
   if (isLoading) {
@@ -81,6 +83,7 @@ export default function StudyMaterialView({
   const handleSave = async () => {
     if (saving || savedLocal) return;
     setSaving(true);
+    setSaveError(null);
     try {
       if (typeof onSaveToLibrary === 'function') {
         await onSaveToLibrary(topic);
@@ -90,6 +93,7 @@ export default function StudyMaterialView({
       setTimeout(() => setSaveToast(false), 3500);
     } catch (err) {
       console.error('Failed to save topic to library:', err);
+      setSaveError(err.message || 'Failed to save notes to database. Please retry.');
     } finally {
       setSaving(false);
     }
@@ -137,6 +141,24 @@ export default function StudyMaterialView({
             <div className="text-xs font-bold">Saved to My Library!</div>
             <div className="text-[11px] text-[#E8B786]">You can access this note anytime in your library.</div>
           </div>
+        </div>
+      )}
+
+      {/* Save Error Alert with Retry */}
+      {saveError && (
+        <div className="p-4 bg-[#FDF1F1] border border-[#F2C6C6] rounded-2xl flex items-center justify-between gap-3 text-xs text-[#B93838] animate-fadeIn">
+          <div className="flex items-center gap-2">
+            <AlertCircle size={16} className="shrink-0" />
+            <span>{saveError}</span>
+          </div>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving}
+            className="px-3 py-1 rounded-lg bg-[#B93838] hover:bg-[#9B2A2A] text-white font-bold transition-colors"
+          >
+            Retry Save
+          </button>
         </div>
       )}
 

@@ -158,17 +158,35 @@ function generateFallbackStudyMaterial(rawText, userTitle = '', subject = 'Gener
     }
   ];
 
+  let resolvedSubject = subject && subject !== 'General Science' ? subject : '';
+  if (!resolvedSubject) {
+    const textLower = cleanText.toLowerCase();
+    if (textLower.match(/algorithm|stack|queue|tree|graph|binary|runtime|complexity|memory|cpu|cache|thread|process|database|sql|acid|query|socket|http|network/)) {
+      resolvedSubject = 'Computer Science';
+    } else if (textLower.match(/cell|protein|enzyme|chemiosmosis|dna|rna|gene|membrane|mitochondria|atp|respiration/)) {
+      resolvedSubject = 'Biochemistry & Life Sciences';
+    } else if (textLower.match(/inflation|market|taylor rule|rate|monetary|central bank|equilibrium|gdp|capital|finance/)) {
+      resolvedSubject = 'Economics & Finance';
+    } else if (textLower.match(/quantum|physics|electron|thermodynamics|wave|particle|mechanics|relativity/)) {
+      resolvedSubject = 'Physics';
+    } else if (textLower.match(/neuron|synapse|plasticity|cortex|cognitive|memory|brain|perception/)) {
+      resolvedSubject = 'Cognitive Neuroscience';
+    } else {
+      resolvedSubject = 'General Academic';
+    }
+  }
+
   return {
     id: 'topic-' + Date.now(),
     title,
-    subject,
-    subjectCode: subject.slice(0, 3).toUpperCase() + ' 101',
+    subject: resolvedSubject,
+    subjectCode: resolvedSubject.slice(0, 3).toUpperCase() + ' 101',
     readTime,
     createdAt: new Date().toISOString().split('T')[0],
     lastStudied: 'Just now',
     masteryScore: 0,
     isStarred: false,
-    tags: [subject, "AI Generated", "RecallMe Study Set"],
+    tags: [resolvedSubject, "AI Generated", "RecallMe Study Set"],
     summary: takeaways.join(' ') || cleanText.slice(0, 160) + '...',
     sourceExcerpt: cleanText,
     sections,

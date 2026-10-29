@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
-  BookOpen, 
   CheckSquare, 
   Square, 
   ArrowRight, 
@@ -14,7 +13,6 @@ import {
 export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
-  const [subject, setSubject] = useState('Machine Learning');
   const [text, setText] = useState(initialText);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationStep, setGenerationStep] = useState('');
@@ -39,12 +37,12 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!text.trim()) return;
+    if (!text.trim() || isGenerating) return;
 
     setIsGenerating(true);
     setErrorMessage(null);
     setGenerationProgress(25);
-    setGenerationStep('Contacting RecallMe AI Engine & parsing text...');
+    setGenerationStep('Contacting RecallMe AI Engine & parsing content...');
 
     const timer1 = setTimeout(() => {
       setGenerationProgress(65);
@@ -53,11 +51,11 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
 
     const timer2 = setTimeout(() => {
       setGenerationProgress(90);
-      setGenerationStep('Synthesizing structured notes & recall quiz questions...');
+      setGenerationStep('Synthesizing structured notes & active recall questions...');
     }, 1200);
 
     try {
-      await onGenerate(text, title, options, subject);
+      await onGenerate(text.trim(), title.trim(), options);
     } catch (err) {
       console.error('Generation error:', err);
       setErrorMessage(err.message || 'Failed to generate study notes. Please try again.');
@@ -91,7 +89,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
           Create Study Material
         </h1>
         <p className="text-sm text-[#706B66] leading-relaxed">
-          Paste your lecture transcript, textbook chapter, or research paper excerpt. RecallMe extracts structured summaries, key terminology, and an active recall quiz.
+          Paste your lecture transcript, textbook chapter, or research paper excerpt. RecallMe automatically analyzes the domain and extracts structured summaries, key terminology, and an active recall quiz.
         </p>
       </div>
 
@@ -105,39 +103,18 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         
-        {/* Title & Subject row */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="sm:col-span-2 space-y-1.5">
-            <label className="text-xs font-bold text-[#252525] uppercase tracking-wider block">
-              Topic Title <span className="font-normal text-[#706B66]">(Auto-inferred if blank)</span>
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., Cellular Respiration & Chemiosmosis"
-              className="input-glow w-full text-sm bg-white border border-[#E7E0D8] rounded-xl px-4 py-2.5 text-[#252525] focus:outline-none focus:bg-white font-sans shadow-xs"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-[#252525] uppercase tracking-wider block">
-              Academic Domain
-            </label>
-            <select
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              className="input-glow w-full text-sm bg-white border border-[#E7E0D8] rounded-xl px-3.5 py-2.5 text-[#252525] focus:outline-none focus:bg-white font-sans shadow-xs font-semibold"
-            >
-              <option value="Machine Learning">Machine Learning</option>
-              <option value="Cognitive Science">Cognitive Science</option>
-              <option value="Distributed Systems">Distributed Systems</option>
-              <option value="Biochemistry">Biochemistry</option>
-              <option value="Behavioral Economics">Behavioral Economics</option>
-              <option value="Quantum Physics">Quantum Physics</option>
-              <option value="General Science">General Science</option>
-            </select>
-          </div>
+        {/* Topic Title (Optional) */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-[#252525] uppercase tracking-wider block">
+            Topic Title <span className="font-normal text-[#706B66]">(Optional — auto-inferred from content if left blank)</span>
+          </label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g., Cellular Respiration & Chemiosmosis, The Taylor Rule, or Transformer Self-Attention"
+            className="input-glow w-full text-sm bg-white border border-[#E7E0D8] rounded-xl px-4 py-3 text-[#252525] focus:outline-none focus:bg-white font-sans shadow-xs transition-colors"
+          />
         </div>
 
         {/* Source Content Textarea */}
@@ -283,7 +260,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
                 className="btn-tactile w-full sm:w-auto px-6 py-3 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide shadow-xs flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Sparkles size={14} />
-                <span>Generate Study Notes</span>
+                <span>Create Notes</span>
                 <ArrowRight size={14} />
               </button>
             </div>
