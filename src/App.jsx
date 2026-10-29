@@ -24,6 +24,8 @@ import {
   recordQuizAttempt 
 } from './services/api';
 
+import AmbientBackground from './components/common/AmbientBackground';
+
 // Wrapper to find topic by ID for Study view
 function StudyRouteWrapper({ topics, onStartQuiz, onToggleStar }) {
   const { id } = useParams();
@@ -170,12 +172,15 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div className="min-h-screen bg-ivory text-mainText flex flex-col antialiased font-sans">
+        <div className="min-h-screen bg-ivory text-mainText flex flex-col antialiased font-sans relative">
+          {/* Subtle Ambient Background Depth */}
+          <AmbientBackground />
+
           {/* Polished Top Navigation */}
           <Navbar />
 
           {/* Main Content Area */}
-          <main className="flex-1">
+          <main className="flex-1 page-enter">
             <Routes>
               {/* Public Marketing / Auth Routes */}
               <Route path="/" element={<LandingPage />} />

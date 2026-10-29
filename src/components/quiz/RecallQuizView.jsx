@@ -175,14 +175,14 @@ export default function RecallQuizView({
         {/* Progress Bar */}
         <div className="w-full bg-white border border-[#E7E0D8] h-2.5 rounded-full overflow-hidden">
           <div 
-            className="bg-[#C65D32] h-full transition-all duration-300 ease-out rounded-full"
+            className="progress-bar-smooth bg-[#C65D32] h-full rounded-full"
             style={{ width: `${progressPercent}%` }}
           ></div>
         </div>
       </div>
 
-      {/* Question Card */}
-      <div className="bg-white border border-[#E7E0D8] rounded-2xl p-6 sm:p-8 shadow-card space-y-6">
+      {/* Question Card with subtle 3D lift */}
+      <div className="card-interactive bg-white border border-[#E7E0D8] rounded-2xl p-6 sm:p-8 shadow-card space-y-6">
         
         <div className="space-y-1.5">
           <div className="text-[11px] font-bold uppercase tracking-wider text-[#C65D32] flex items-center gap-1.5">
@@ -205,17 +205,17 @@ export default function RecallQuizView({
                 key={optIdx}
                 type="button"
                 onClick={() => handleSelectOption(optIdx)}
-                className={`w-full p-4 rounded-xl border text-left transition-all duration-150 flex items-start gap-3.5 ${
+                className={`btn-tactile w-full p-4 rounded-xl border text-left flex items-start gap-3.5 ${
                   isSelected
-                    ? 'bg-[#FBF4EE] border-[#C65D32] text-[#252525] ring-1 ring-[#C65D32] shadow-xs'
-                    : 'bg-white border-[#E7E0D8] text-[#252525] hover:bg-[#FAF8F5]'
+                    ? 'bg-[#FBF4EE] border-[#C65D32] text-[#252525] ring-1 ring-[#C65D32] shadow-xs scale-[1.006]'
+                    : 'bg-white border-[#E7E0D8] text-[#252525] hover:bg-[#FAF8F5] hover:border-[#D8CFC5] hover:translate-x-1'
                 }`}
               >
                 {/* Letter Key Pill */}
                 <span
-                  className={`w-7 h-7 rounded-lg flex items-center justify-center font-mono text-xs font-bold shrink-0 transition-colors ${
+                  className={`w-7 h-7 rounded-lg flex items-center justify-center font-mono text-xs font-bold shrink-0 transition-transform ${
                     isSelected
-                      ? 'bg-[#C65D32] text-white shadow-xs'
+                      ? 'bg-[#C65D32] text-white shadow-xs scale-105'
                       : 'bg-[#F7F3ED] text-[#222222] border border-[#E7E0D8]'
                   }`}
                 >
@@ -238,7 +238,7 @@ export default function RecallQuizView({
           type="button"
           onClick={handlePrev}
           disabled={currentIndex === 0}
-          className="px-4 py-2.5 rounded-xl text-xs font-bold text-[#706B66] hover:text-[#222222] border border-[#E7E0D8] bg-white hover:bg-[#FAF8F5] transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1.5"
+          className="btn-tactile px-4 py-2.5 rounded-xl text-xs font-bold text-[#706B66] hover:text-[#222222] border border-[#E7E0D8] bg-white hover:bg-[#FAF8F5] disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1.5"
         >
           <ArrowLeft size={14} />
           <span>Previous</span>
@@ -253,7 +253,7 @@ export default function RecallQuizView({
             type="button"
             onClick={handleNext}
             disabled={!isAnswered}
-            className="px-6 py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide transition-colors flex items-center gap-2 shadow-xs disabled:opacity-40 disabled:cursor-not-allowed"
+            className="btn-tactile px-6 py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide flex items-center gap-2 shadow-xs disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <span>{isLastQuestion ? 'Submit & View Score' : 'Next Question'}</span>
             <ArrowRight size={14} />

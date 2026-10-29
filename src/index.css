@@ -39,7 +39,172 @@
   background: #C65D32;
 }
 
-/* Restrained accent utilities */
-.burnt-accent-glow {
-  box-shadow: 0 0 0 1px #C65D32;
+/* 3D and Micro-Interaction Utilities */
+@layer utilities {
+  /* Fast, subtle page transition */
+  .page-enter {
+    animation: pageFadeIn 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Tactile interactive button behavior */
+  .btn-tactile {
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), 
+                box-shadow 0.15s cubic-bezier(0.16, 1, 0.3, 1), 
+                background-color 0.15s ease,
+                border-color 0.15s ease;
+    will-change: transform;
+  }
+  .btn-tactile:hover {
+    transform: translateY(-1px);
+  }
+  .btn-tactile:active {
+    transform: translateY(0.5px) scale(0.985);
+  }
+
+  /* Interactive card hover lift with layered shadow */
+  .card-interactive {
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
+                box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
+                border-color 0.2s ease;
+    will-change: transform, box-shadow;
+  }
+  .card-interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -4px rgba(34, 34, 34, 0.07), 0 4px 8px -2px rgba(34, 34, 34, 0.03);
+  }
+
+  /* Focus ring glow for inputs */
+  .input-glow {
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+  }
+  .input-glow:focus {
+    box-shadow: 0 0 0 3px rgba(198, 93, 50, 0.15);
+    border-color: #C65D32;
+  }
+
+  /* 3D Flashcard Flip utilities */
+  .flashcard-perspective {
+    perspective: 1200px;
+  }
+  .flashcard-inner {
+    position: relative;
+    width: 100%;
+    min-height: 220px;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .flashcard-inner.is-flipped {
+    transform: rotateY(180deg);
+  }
+  .flashcard-front,
+  .flashcard-back {
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .flashcard-back {
+    position: absolute;
+    inset: 0;
+    transform: rotateY(180deg);
+  }
+
+  /* Smooth GPU-accelerated progress bar */
+  .progress-bar-smooth {
+    transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: width;
+  }
+
+  /* Subtle card glare reflection */
+  .card-glare {
+    position: relative;
+    overflow: hidden;
+  }
+  .card-glare::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      105deg,
+      transparent 35%,
+      rgba(255, 255, 255, 0.4) 48%,
+      transparent 60%
+    );
+    opacity: 0;
+    transform: translateX(-100%);
+    transition: opacity 0.3s ease, transform 0.6s ease;
+  }
+  .card-glare:hover::after {
+    opacity: 1;
+    transform: translateX(100%);
+  }
+}
+
+/* Keyframes */
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ambient Floating Background Orbs */
+@keyframes ambientDrift1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(30px, -20px) scale(1.05);
+  }
+}
+
+@keyframes ambientDrift2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-25px, 25px) scale(1.08);
+  }
+}
+
+.ambient-orb-1 {
+  animation: ambientDrift1 18s ease-in-out infinite;
+  will-change: transform;
+}
+
+.ambient-orb-2 {
+  animation: ambientDrift2 22s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Accessibility: Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .btn-tactile:hover,
+  .btn-tactile:active,
+  .card-interactive:hover {
+    transform: none !important;
+  }
+
+  .flashcard-inner {
+    transition: none !important;
+  }
+
+  .ambient-orb-1,
+  .ambient-orb-2 {
+    animation: none !important;
+  }
 }

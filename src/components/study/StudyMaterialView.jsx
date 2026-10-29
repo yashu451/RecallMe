@@ -66,7 +66,7 @@ export default function StudyMaterialView({
       <div className="flex items-center justify-between border-b border-[#E7E0D8] pb-4">
         <button
           onClick={onBack || (() => navigate('/library'))}
-          className="text-xs font-bold text-[#706B66] hover:text-[#222222] flex items-center gap-1.5 transition-colors"
+          className="text-xs font-bold text-[#706B66] hover:text-[#222222] flex items-center gap-1.5 transition-colors btn-tactile"
         >
           <ArrowLeft size={14} />
           <span>Back to Library</span>
@@ -76,7 +76,7 @@ export default function StudyMaterialView({
           {/* Star Bookmark */}
           <button
             onClick={() => onToggleStar(topic.id)}
-            className={`p-2 rounded-xl border transition-all ${
+            className={`p-2 rounded-xl border transition-all btn-tactile ${
               topic.isStarred
                 ? 'bg-[#FAF5EF] text-[#C65D32] border-[#E8B786]'
                 : 'text-[#706B66] hover:text-[#222222] bg-white border-[#E7E0D8]'
@@ -89,7 +89,7 @@ export default function StudyMaterialView({
           {/* Copy Markdown */}
           <button
             onClick={handleCopyMarkdown}
-            className="px-3 py-1.5 rounded-xl text-xs font-bold text-[#252525] bg-white hover:bg-[#FAF8F5] border border-[#E7E0D8] transition-colors flex items-center gap-1.5 shadow-xs"
+            className="px-3 py-1.5 rounded-xl text-xs font-bold text-[#252525] bg-white hover:bg-[#FAF8F5] border border-[#E7E0D8] transition-colors flex items-center gap-1.5 shadow-xs btn-tactile"
           >
             {copied ? <Check size={14} className="text-[#38765C]" /> : <Copy size={14} />}
             <span>{copied ? 'Copied' : 'Export Notes'}</span>
@@ -101,7 +101,7 @@ export default function StudyMaterialView({
               onStartQuiz(topic);
               navigate(`/quiz/${topic.id}`);
             }}
-            className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] transition-colors flex items-center gap-1.5 shadow-xs"
+            className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] transition-colors flex items-center gap-1.5 shadow-xs btn-tactile"
           >
             <span>Take Recall Quiz</span>
             <ArrowRight size={13} />
@@ -203,7 +203,7 @@ export default function StudyMaterialView({
 
           {/* Quick Clickable Term Inspector */}
           {topic.keywords && topic.keywords.length > 0 && (
-            <div className="p-4 bg-white border border-[#E7E0D8] rounded-xl space-y-2.5 shadow-subtle">
+            <div className="p-4 bg-white border border-[#E7E0D8] rounded-xl space-y-2.5 shadow-subtle card-interactive">
               <div className="text-xs font-bold uppercase tracking-wider text-[#706B66] flex items-center justify-between">
                 <span>Core Highlighted Terms in this topic (click for definition):</span>
                 <span className="text-[11px] text-[#706B66] font-normal">Interactive Glossary</span>
@@ -213,7 +213,7 @@ export default function StudyMaterialView({
                   <button
                     key={i}
                     onClick={() => setActiveKeywordModal(kw)}
-                    className="text-xs px-3 py-1 rounded-lg bg-[#FAF8F5] hover:bg-[#FBF4EE] text-[#252525] hover:text-[#C65D32] border border-[#E7E0D8] hover:border-[#ECD0C0] transition-colors font-bold flex items-center gap-1.5 shadow-xs"
+                    className="text-xs px-3 py-1 rounded-lg bg-[#FAF8F5] hover:bg-[#FBF4EE] text-[#252525] hover:text-[#C65D32] border border-[#E7E0D8] hover:border-[#ECD0C0] transition-colors font-bold flex items-center gap-1.5 shadow-xs btn-tactile"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-[#C65D32]"></span>
                     <span>{kw.term}</span>
@@ -226,7 +226,7 @@ export default function StudyMaterialView({
           {/* Sectional content breakdown */}
           <div className="space-y-8 pt-2">
             {topic.sections?.map((section, idx) => (
-              <section key={idx} className="space-y-3 bg-white p-6 sm:p-7 rounded-2xl border border-[#E7E0D8] shadow-card">
+              <section key={idx} className="space-y-3 bg-white p-6 sm:p-7 rounded-2xl border border-[#E7E0D8] shadow-card card-interactive">
                 <h2 className="text-lg sm:text-xl font-bold text-[#222222] tracking-tight border-b border-[#E7E0D8] pb-2">
                   {section.heading}
                 </h2>
@@ -238,7 +238,7 @@ export default function StudyMaterialView({
           </div>
 
           {/* Interactive Term Highlight Legend */}
-          <div className="p-4 bg-white border border-[#E7E0D8] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-subtle">
+          <div className="p-4 bg-white border border-[#E7E0D8] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-subtle card-interactive">
             <div className="flex items-center gap-2 text-[#706B66]">
               <Info size={16} className="text-[#C65D32] shrink-0" />
               <span>
@@ -247,7 +247,7 @@ export default function StudyMaterialView({
             </div>
             <button
               onClick={() => setActiveTab('definitions')}
-              className="text-[#C65D32] hover:text-[#983E1A] font-bold self-start sm:self-auto"
+              className="text-[#C65D32] hover:text-[#983E1A] font-bold self-start sm:self-auto btn-tactile"
             >
               View all definitions →
             </button>
@@ -267,7 +267,7 @@ export default function StudyMaterialView({
             {topic.keywords?.map((kw, idx) => (
               <div 
                 key={idx}
-                className="p-5 bg-white border border-[#E7E0D8] rounded-2xl shadow-subtle space-y-2 hover:border-[#C65D32] transition-colors"
+                className="p-5 bg-white border border-[#E7E0D8] rounded-2xl shadow-subtle space-y-2 hover:border-[#C65D32] transition-all card-interactive"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-mono font-bold uppercase px-2 py-0.5 rounded bg-[#FBF4EE] text-[#C65D32] border border-[#ECD0C0]">
@@ -296,7 +296,7 @@ export default function StudyMaterialView({
 
           <div className="border border-[#E7E0D8] rounded-2xl bg-white divide-y divide-[#E7E0D8] overflow-hidden shadow-card">
             {topic.definitions?.map((def, idx) => (
-              <div key={idx} className="p-5 space-y-2">
+              <div key={idx} className="p-5 space-y-2 hover:bg-[#FAF8F5]/60 transition-colors">
                 <div className="flex items-baseline gap-3 flex-wrap">
                   <h3 className="text-base font-bold text-[#222222]">
                     {def.term}
@@ -340,7 +340,7 @@ export default function StudyMaterialView({
                 onStartQuiz(topic);
                 navigate(`/quiz/${topic.id}`);
               }}
-              className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] transition-colors flex items-center gap-1.5 shadow-xs"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] transition-colors flex items-center gap-1.5 shadow-xs btn-tactile"
             >
               <span>Launch Quiz Session</span>
               <ArrowRight size={13} />
@@ -351,7 +351,7 @@ export default function StudyMaterialView({
             {topic.quiz?.map((q, idx) => (
               <div 
                 key={q.id || idx}
-                className="p-5 bg-white border border-[#E7E0D8] rounded-2xl space-y-3 shadow-subtle"
+                className="p-5 bg-white border border-[#E7E0D8] rounded-2xl space-y-3 shadow-subtle card-interactive"
               >
                 <div className="flex items-center justify-between text-xs text-[#706B66] font-mono">
                   <span>Question 0{idx + 1}</span>
@@ -381,7 +381,7 @@ export default function StudyMaterialView({
 
       {/* Bottom Call to Action for Active Recall */}
       <div className="pt-6 border-t border-[#E7E0D8]">
-        <div className="p-6 bg-white border border-[#E7E0D8] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-card">
+        <div className="p-6 bg-white border border-[#E7E0D8] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-card card-interactive">
           <div className="space-y-1">
             <div className="text-base font-bold text-[#222222]">
               Ready to verify your retention of this material?
@@ -395,7 +395,7 @@ export default function StudyMaterialView({
               onStartQuiz(topic);
               navigate(`/quiz/${topic.id}`);
             }}
-            className="px-5 py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide transition-colors flex items-center justify-center gap-2 self-start sm:self-auto shadow-xs"
+            className="px-5 py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide transition-colors flex items-center justify-center gap-2 self-start sm:self-auto shadow-xs btn-tactile"
           >
             <span>Start Recall Quiz</span>
             <ArrowRight size={14} />
@@ -413,7 +413,7 @@ export default function StudyMaterialView({
               </span>
               <button
                 onClick={() => setActiveKeywordModal(null)}
-                className="text-[#706B66] hover:text-[#222222] p-1 rounded-md"
+                className="text-[#706B66] hover:text-[#222222] p-1 rounded-md transition-colors btn-tactile"
               >
                 <X size={18} />
               </button>
@@ -430,7 +430,7 @@ export default function StudyMaterialView({
             <div className="pt-2 flex justify-end">
               <button
                 onClick={() => setActiveKeywordModal(null)}
-                className="px-4 py-2 rounded-xl bg-[#F7F3ED] hover:bg-[#EFE9DF] text-[#222222] text-xs font-bold transition-colors"
+                className="px-4 py-2 rounded-xl bg-[#F7F3ED] hover:bg-[#EFE9DF] text-[#222222] text-xs font-bold transition-colors btn-tactile"
               >
                 Got it
               </button>

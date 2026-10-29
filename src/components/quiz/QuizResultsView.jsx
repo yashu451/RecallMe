@@ -51,7 +51,7 @@ export default function QuizResultsView({
       <div className="flex items-center justify-between border-b border-[#E7E0D8] pb-4">
         <button
           onClick={() => navigate('/library')}
-          className="text-xs font-bold text-[#706B66] hover:text-[#222222] flex items-center gap-1.5 transition-colors"
+          className="text-xs font-bold text-[#706B66] hover:text-[#222222] flex items-center gap-1.5 transition-colors btn-tactile"
         >
           <ArrowLeft size={14} />
           <span>My Study Library</span>
@@ -63,7 +63,7 @@ export default function QuizResultsView({
       </div>
 
       {/* 1. Score Summary Header Card */}
-      <header className="bg-white border border-[#E7E0D8] rounded-2xl p-6 sm:p-8 shadow-card space-y-6">
+      <header className="bg-white border border-[#E7E0D8] rounded-2xl p-6 sm:p-8 shadow-card space-y-6 card-interactive">
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-[#FBF4EE] text-[#C65D32] border border-[#ECD0C0]">
             {subject}
@@ -81,7 +81,7 @@ export default function QuizResultsView({
                 Quiz Completed!
               </h1>
               {percentage >= 80 && (
-                <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FAF5EF] text-[#7A3216] text-xs font-bold border border-[#E8B786]">
+                <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FAF5EF] text-[#7A3216] text-xs font-bold border border-[#E8B786] shadow-xs">
                   <Flame size={14} className="text-[#C65D32] fill-[#C65D32]" />
                   <span>Streak Maintained</span>
                 </div>
@@ -93,7 +93,7 @@ export default function QuizResultsView({
           </div>
 
           {/* Score Badge */}
-          <div className="p-5 bg-[#FAF8F5] border border-[#E7E0D8] rounded-2xl text-right min-w-[170px] shadow-xs shrink-0">
+          <div className="p-5 bg-[#FAF8F5] border border-[#E7E0D8] rounded-2xl text-right min-w-[170px] shadow-xs shrink-0 card-interactive">
             <div className="text-[10px] font-mono uppercase tracking-wider text-[#706B66] font-bold">
               Retention Score
             </div>
@@ -117,7 +117,7 @@ export default function QuizResultsView({
               if (onRetryQuiz) onRetryQuiz();
               navigate(`/quiz/${topicId}`);
             }}
-            className="px-5 py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide transition-colors flex items-center gap-2 shadow-xs"
+            className="px-5 py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide transition-colors flex items-center gap-2 shadow-xs btn-tactile"
           >
             <RotateCcw size={14} />
             <span>Retry Quiz</span>
@@ -128,7 +128,7 @@ export default function QuizResultsView({
               if (onReviewNotes) onReviewNotes();
               navigate(`/study/${topicId}`);
             }}
-            className="px-4 py-2.5 rounded-xl bg-white hover:bg-[#FAF8F5] text-[#252525] text-xs font-bold border border-[#E7E0D8] transition-colors flex items-center gap-2 shadow-xs"
+            className="px-4 py-2.5 rounded-xl bg-white hover:bg-[#FAF8F5] text-[#252525] text-xs font-bold border border-[#E7E0D8] transition-colors flex items-center gap-2 shadow-xs btn-tactile"
           >
             <BookOpen size={14} />
             <span>Review Study Notes</span>
@@ -136,7 +136,7 @@ export default function QuizResultsView({
 
           <button
             onClick={() => navigate('/library')}
-            className="px-4 py-2.5 rounded-xl bg-[#F7F3ED] hover:bg-[#EFE9DF] text-[#222222] text-xs font-bold transition-colors"
+            className="px-4 py-2.5 rounded-xl bg-[#F7F3ED] hover:bg-[#EFE9DF] text-[#222222] text-xs font-bold transition-colors btn-tactile"
           >
             Back to Library
           </button>
@@ -160,7 +160,7 @@ export default function QuizResultsView({
             return (
               <div
                 key={item.questionId || idx}
-                className={`p-6 rounded-2xl border bg-white shadow-subtle transition-all space-y-3.5 ${
+                className={`p-6 rounded-2xl border bg-white shadow-subtle transition-all space-y-3.5 card-interactive ${
                   isCorrect
                     ? 'border-[#E7E0D8] border-l-4 border-l-[#38765C]'
                     : 'border-[#E7E0D8] border-l-4 border-l-[#B93838]'
