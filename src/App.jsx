@@ -136,7 +136,7 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col antialiased font-sans">
+        <div className="min-h-screen bg-ivory text-mainText flex flex-col antialiased font-sans">
           {/* Polished Top Navigation */}
           <Navbar />
 

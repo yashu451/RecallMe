@@ -5,8 +5,6 @@ import {
   ArrowRight, 
   Clock, 
   X, 
-  CheckCircle2, 
-  Sparkles,
   Zap
 } from 'lucide-react';
 
@@ -123,10 +121,10 @@ export default function RecallQuizView({
   if (!currentQuestion) {
     return (
       <div className="max-w-xl mx-auto py-16 text-center space-y-4">
-        <p className="text-slate-600">No questions found for this topic.</p>
+        <p className="text-[#706B66]">No questions found for this topic.</p>
         <button
           onClick={onExitQuiz || (() => navigate('/library'))}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold"
+          className="px-4 py-2 bg-[#C65D32] hover:bg-[#B64E24] text-white rounded-xl text-sm font-bold"
         >
           Return to Notes
         </button>
@@ -142,56 +140,56 @@ export default function RecallQuizView({
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-8 select-none animate-fadeIn">
       
       {/* Top Controls & Meta */}
-      <div className="flex items-center justify-between border-b border-slate-200/80 pb-4">
+      <div className="flex items-center justify-between border-b border-[#E7E0D8] pb-4">
         <button
           onClick={onExitQuiz || (() => navigate(`/study/${topic.id}`))}
-          className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1.5 transition-colors"
+          className="text-xs font-bold text-[#706B66] hover:text-[#222222] flex items-center gap-1.5 transition-colors"
         >
           <X size={16} />
           <span>Exit Session</span>
         </button>
 
-        <div className="flex items-center gap-3 text-xs font-mono text-slate-500">
-          <span className="flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded">
-            <Clock size={12} className="text-slate-400" />
+        <div className="flex items-center gap-3 text-xs font-mono text-[#706B66]">
+          <span className="flex items-center gap-1 bg-white border border-[#E7E0D8] px-2.5 py-0.5 rounded">
+            <Clock size={12} className="text-[#706B66]" />
             {formatTime(elapsedSeconds)}
           </span>
           <span>•</span>
-          <span className="text-slate-800 font-bold">
+          <span className="text-[#222222] font-bold">
             {topic.subject}
           </span>
         </div>
       </div>
 
-      {/* Duolingo / Linear-inspired Progress Indicator */}
+      {/* Progress Indicator */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-xs font-bold">
-          <span className="text-slate-500">
-            Question <strong className="text-slate-900">{currentIndex + 1}</strong> of {total}
+          <span className="text-[#706B66]">
+            Question <strong className="text-[#222222]">{currentIndex + 1}</strong> of {total}
           </span>
-          <span className="text-indigo-600 font-mono">
+          <span className="text-[#C65D32] font-mono">
             {Math.round(progressPercent)}% Completed
           </span>
         </div>
 
         {/* Progress Bar */}
-        <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+        <div className="w-full bg-white border border-[#E7E0D8] h-2.5 rounded-full overflow-hidden">
           <div 
-            className="bg-gradient-to-r from-indigo-500 to-indigo-600 h-full transition-all duration-300 ease-out rounded-full"
+            className="bg-[#C65D32] h-full transition-all duration-300 ease-out rounded-full"
             style={{ width: `${progressPercent}%` }}
           ></div>
         </div>
       </div>
 
       {/* Question Card */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-card space-y-6">
+      <div className="bg-white border border-[#E7E0D8] rounded-2xl p-6 sm:p-8 shadow-card space-y-6">
         
-        <div className="space-y-2">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 flex items-center gap-1.5">
+        <div className="space-y-1.5">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-[#C65D32] flex items-center gap-1.5">
             <Zap size={14} />
             <span>Active Retrieval Prompt</span>
           </div>
-          <h2 className="text-lg sm:text-2xl font-bold text-slate-900 leading-snug">
+          <h2 className="text-lg sm:text-2xl font-bold text-[#222222] leading-snug">
             {currentQuestion.question}
           </h2>
         </div>
@@ -209,16 +207,16 @@ export default function RecallQuizView({
                 onClick={() => handleSelectOption(optIdx)}
                 className={`w-full p-4 rounded-xl border text-left transition-all duration-150 flex items-start gap-3.5 ${
                   isSelected
-                    ? 'bg-indigo-50 border-indigo-600 text-indigo-950 shadow-xs ring-1 ring-indigo-600'
-                    : 'bg-white border-slate-200 text-slate-800 hover:bg-slate-50/80 hover:border-slate-300'
+                    ? 'bg-[#FBF4EE] border-[#C65D32] text-[#252525] ring-1 ring-[#C65D32] shadow-xs'
+                    : 'bg-white border-[#E7E0D8] text-[#252525] hover:bg-[#FAF8F5]'
                 }`}
               >
                 {/* Letter Key Pill */}
                 <span
                   className={`w-7 h-7 rounded-lg flex items-center justify-center font-mono text-xs font-bold shrink-0 transition-colors ${
                     isSelected
-                      ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-600 border border-slate-200'
+                      ? 'bg-[#C65D32] text-white shadow-xs'
+                      : 'bg-[#F7F3ED] text-[#222222] border border-[#E7E0D8]'
                   }`}
                 >
                   {letter}
@@ -240,14 +238,14 @@ export default function RecallQuizView({
           type="button"
           onClick={handlePrev}
           disabled={currentIndex === 0}
-          className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1.5"
+          className="px-4 py-2.5 rounded-xl text-xs font-bold text-[#706B66] hover:text-[#222222] border border-[#E7E0D8] bg-white hover:bg-[#FAF8F5] transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1.5"
         >
           <ArrowLeft size={14} />
           <span>Previous</span>
         </button>
 
         <div className="flex items-center gap-3">
-          <span className="text-[11px] text-slate-400 font-mono hidden sm:inline">
+          <span className="text-[11px] text-[#706B66] font-mono hidden sm:inline">
             Press [1-4] or [Enter]
           </span>
 
@@ -255,7 +253,7 @@ export default function RecallQuizView({
             type="button"
             onClick={handleNext}
             disabled={!isAnswered}
-            className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold tracking-wide transition-all flex items-center gap-2 shadow-md shadow-indigo-600/20 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="px-6 py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide transition-colors flex items-center gap-2 shadow-xs disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <span>{isLastQuestion ? 'Submit & View Score' : 'Next Question'}</span>
             <ArrowRight size={14} />

@@ -2,14 +2,11 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Search, 
-  Filter, 
   ArrowRight, 
   BookOpen, 
-  Clock, 
   Star, 
   Trash2, 
-  Plus, 
-  Layers
+  Plus 
 } from 'lucide-react';
 
 export default function LibraryView({ 
@@ -61,22 +58,22 @@ export default function LibraryView({
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
       
       {/* Header */}
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E7E0D8] pb-6">
         <div>
-          <div className="text-xs font-mono uppercase tracking-wider text-indigo-600 font-bold">
+          <div className="text-xs font-mono uppercase tracking-wider text-[#C65D32] font-bold">
             Study Repository
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#222222] tracking-tight mt-1">
             My Study Library
           </h1>
-          <p className="text-sm text-slate-600 mt-1">
+          <p className="text-sm text-[#706B66] mt-1">
             {topics.length} synthesized study topics with active recall decks.
           </p>
         </div>
 
         <button
           onClick={() => navigate('/create')}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold tracking-wide transition-all shadow-md shadow-indigo-600/20 self-start sm:self-auto"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide transition-colors shadow-xs self-start sm:self-auto"
         >
           <Plus size={16} />
           <span>New Study Notes</span>
@@ -88,18 +85,18 @@ export default function LibraryView({
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           {/* Search Input */}
           <div className="relative flex-1">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#706B66]" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by topic title, concept, or keyword tag..."
-              className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent shadow-xs"
+              className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent shadow-xs"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-700"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#706B66] hover:text-[#222222]"
               >
                 Clear
               </button>
@@ -111,7 +108,7 @@ export default function LibraryView({
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="text-xs bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 shadow-xs font-medium"
+              className="text-xs bg-white border border-[#E7E0D8] rounded-xl px-3 py-2 text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] shadow-xs font-semibold"
             >
               <option value="recent">Sort: Most Recent</option>
               <option value="mastery">Sort: Retention Score</option>
@@ -121,13 +118,13 @@ export default function LibraryView({
             {/* Starred filter button */}
             <button
               onClick={() => setOnlyStarred(!onlyStarred)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-semibold border flex items-center gap-1.5 transition-all shadow-xs ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold border flex items-center gap-1.5 transition-all shadow-xs ${
                 onlyStarred
-                  ? 'bg-amber-50 text-amber-800 border-amber-300'
-                  : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                  ? 'bg-[#FAF5EF] text-[#7A3216] border-[#E8B786]'
+                  : 'bg-white text-[#706B66] border-[#E7E0D8] hover:bg-[#FAF8F5]'
               }`}
             >
-              <Star size={14} className={onlyStarred ? 'fill-amber-500 text-amber-500' : ''} />
+              <Star size={14} className={onlyStarred ? 'fill-[#C65D32] text-[#C65D32]' : ''} />
               <span>Starred</span>
             </button>
           </div>
@@ -141,10 +138,10 @@ export default function LibraryView({
               <button
                 key={subj}
                 onClick={() => setSelectedSubject(subj)}
-                className={`text-xs px-3.5 py-1.5 rounded-full whitespace-nowrap transition-all font-semibold ${
+                className={`text-xs px-3.5 py-1.5 rounded-full whitespace-nowrap transition-colors font-bold ${
                   isSelected
-                    ? 'bg-indigo-600 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200/60'
+                    ? 'bg-[#C65D32] text-white shadow-xs'
+                    : 'bg-white text-[#706B66] hover:text-[#222222] hover:bg-[#FAF8F5] border border-[#E7E0D8]'
                 }`}
               >
                 {subj}
@@ -157,41 +154,41 @@ export default function LibraryView({
       {/* Topics List */}
       <div className="space-y-3">
         {filteredTopics.length === 0 ? (
-          <div className="p-12 text-center border border-slate-200 rounded-2xl bg-white space-y-3 shadow-subtle">
-            <BookOpen size={32} className="mx-auto text-slate-300" />
-            <h3 className="text-base font-bold text-slate-800">No matching study materials found</h3>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+          <div className="p-12 text-center border border-[#E7E0D8] rounded-2xl bg-white space-y-3 shadow-subtle">
+            <BookOpen size={32} className="mx-auto text-[#D8CFC5]" />
+            <h3 className="text-base font-bold text-[#222222]">No matching study materials found</h3>
+            <p className="text-xs text-[#706B66] max-w-sm mx-auto">
               Try adjusting your search query or reset domain filters to view your notes.
             </p>
             <button
               onClick={() => { setSearchQuery(''); setSelectedSubject('All'); setOnlyStarred(false); }}
-              className="text-xs text-indigo-600 hover:text-indigo-800 font-bold"
+              className="text-xs text-[#C65D32] hover:text-[#983E1A] font-bold"
             >
               Reset all filters
             </button>
           </div>
         ) : (
-          <div className="border border-slate-200/80 rounded-2xl bg-white divide-y divide-slate-100 overflow-hidden shadow-card">
+          <div className="border border-[#E7E0D8] rounded-2xl bg-white divide-y divide-[#E7E0D8] overflow-hidden shadow-card">
             {filteredTopics.map((topic) => (
               <div 
                 key={topic.id}
-                className="p-5 hover:bg-slate-50/70 transition-all flex flex-col sm:flex-row sm:items-start justify-between gap-4 group"
+                className="p-5 hover:bg-[#FAF8F5] transition-colors flex flex-col sm:flex-row sm:items-start justify-between gap-4 group"
               >
                 {/* Topic Info */}
                 <div className="space-y-2 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#FBF4EE] text-[#C65D32] border border-[#ECD0C0]">
                       {topic.subject}
                     </span>
-                    <span className="text-xs text-slate-400 font-mono">
+                    <span className="text-xs text-[#706B66] font-mono">
                       {topic.readTime}
                     </span>
-                    <span className="text-slate-300">•</span>
-                    <span className="text-xs text-slate-500 font-medium">
+                    <span className="text-[#E7E0D8]">•</span>
+                    <span className="text-xs text-[#706B66] font-medium">
                       {topic.quiz?.length || 4} recall questions
                     </span>
-                    <span className="text-slate-300">•</span>
-                    <span className="text-xs text-slate-400">
+                    <span className="text-[#E7E0D8]">•</span>
+                    <span className="text-xs text-[#706B66]">
                       Added {topic.createdAt}
                     </span>
                   </div>
@@ -201,12 +198,12 @@ export default function LibraryView({
                       onSelectTopic(topic);
                       navigate(`/study/${topic.id}`);
                     }}
-                    className="text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors cursor-pointer"
+                    className="text-lg font-bold text-[#222222] group-hover:text-[#C65D32] transition-colors cursor-pointer"
                   >
                     {topic.title}
                   </h3>
 
-                  <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 max-w-2xl">
+                  <p className="text-xs text-[#706B66] leading-relaxed line-clamp-2 max-w-2xl">
                     {topic.summary}
                   </p>
 
@@ -214,7 +211,7 @@ export default function LibraryView({
                   {topic.tags && (
                     <div className="flex items-center gap-1.5 flex-wrap pt-1">
                       {topic.tags.slice(0, 3).map((tag, i) => (
-                        <span key={i} className="text-[10px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/60">
+                        <span key={i} className="text-[10px] font-semibold text-[#706B66] bg-[#FAF8F5] px-2 py-0.5 rounded border border-[#E7E0D8]">
                           #{tag}
                         </span>
                       ))}
@@ -230,17 +227,17 @@ export default function LibraryView({
                       onClick={() => onToggleStar(topic.id)}
                       className={`p-1.5 rounded-lg transition-colors ${
                         topic.isStarred 
-                          ? 'text-amber-500 hover:text-amber-600' 
-                          : 'text-slate-300 hover:text-slate-600'
+                          ? 'text-[#C65D32] hover:text-[#983E1A]' 
+                          : 'text-[#D8CFC5] hover:text-[#706B66]'
                       }`}
                       title="Star topic"
                     >
-                      <Star size={16} className={topic.isStarred ? 'fill-amber-500' : ''} />
+                      <Star size={16} className={topic.isStarred ? 'fill-[#C65D32]' : ''} />
                     </button>
 
                     <button
                       onClick={() => onDeleteTopic(topic.id)}
-                      className="p-1.5 rounded-lg text-slate-300 hover:text-rose-600 transition-colors"
+                      className="p-1.5 rounded-lg text-[#D8CFC5] hover:text-[#B93838] transition-colors"
                       title="Remove from library"
                     >
                       <Trash2 size={16} />
@@ -249,17 +246,17 @@ export default function LibraryView({
 
                   {/* Mastery Score Progress */}
                   <div className="text-left sm:text-right">
-                    <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">
+                    <div className="text-[10px] uppercase tracking-wider text-[#706B66] font-bold">
                       Mastery Score
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <div className="w-16 bg-slate-100 h-2 rounded-full overflow-hidden">
+                      <div className="w-16 bg-[#FAF8F5] border border-[#E7E0D8] h-2 rounded-full overflow-hidden">
                         <div 
-                          className="bg-indigo-600 h-full rounded-full" 
+                          className="bg-[#C65D32] h-full rounded-full" 
                           style={{ width: `${topic.masteryScore}%` }}
                         ></div>
                       </div>
-                      <span className="font-mono text-xs text-slate-800 font-bold">
+                      <span className="font-mono text-xs text-[#222222] font-bold">
                         {topic.masteryScore}%
                       </span>
                     </div>
@@ -272,7 +269,7 @@ export default function LibraryView({
                         onSelectTopic(topic);
                         navigate(`/study/${topic.id}`);
                       }}
-                      className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors"
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#252525] hover:text-[#222222] bg-[#F7F3ED] hover:bg-[#EFE9DF] border border-[#E7E0D8] transition-colors"
                     >
                       Notes
                     </button>
@@ -281,7 +278,7 @@ export default function LibraryView({
                         onStartQuiz(topic);
                         navigate(`/quiz/${topic.id}`);
                       }}
-                      className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-all flex items-center gap-1 shadow-xs hover:shadow-indigo-500/20"
+                      className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] transition-colors flex items-center gap-1 shadow-xs"
                     >
                       <span>Quiz</span>
                       <ArrowRight size={12} />
