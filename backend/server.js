@@ -13,12 +13,13 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Enable CORS for frontend applications (Vite default is 5173)
+// Enable CORS for all frontend applications and origins
 app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id', 'X-User-Id']
+  origin: true,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
+app.options('*', cors());
 
 // Body parsing with generous limit for full lectures & PDFs
 app.use(express.json({ limit: '10mb' }));
@@ -62,7 +63,7 @@ async function startServer() {
     await initDatabase([], []);
     console.log('[RecallMe Backend] SQLite database ready.');
 
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`===============================================`);
       console.log(`  RecallMe Backend Server is RUNNING!`);
       console.log(`  Port:      http://localhost:${PORT}`);

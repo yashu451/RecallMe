@@ -1,10 +1,53 @@
 /**
  * RecallMe Frontend API Service
  * Communicates with the Express + SQLite + Gemini backend (http://localhost:5000).
- * Falls back gracefully to local processing if the backend server is offline.
+ * Connects seamlessly via Vite's proxy (/api) with direct fallback to port 5000.
  */
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const DIRECT_API_URL = 'http://localhost:5000/api';
+const PROXY_API_URL = '/api';
+
+/**
+ * Resolves the primary API base URL.
+ * In a browser under Vite dev server, relative '/api' utilizes Vite's proxy,
+ * eliminating CORS, preflight overhead, and localhost vs 127.0.0.1 discrepancies.
+ */
+export function getApiBaseUrl() {
+  if (typeof window !== 'undefined' && window.location && window.location.origin) {
+    return PROXY_API_URL;
+  }
+  return DIRECT_API_URL;
+}
+
+/**
+ * Resilient API fetcher:
+ * 1. Attempts request via Vite proxy (/api)
+ * 2. If proxy fails or direct port is preferred, falls back to http://localhost:5000/api
+ * 3. If backend is completely unreachable, throws a descriptive error explaining that the
+ *    backend server on port 5000 is offline.
+ */
+export async function backendFetch(path, options = {}) {
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  const primaryBase = getApiBaseUrl();
+  const primaryUrl = `${primaryBase}/${cleanPath}`;
+
+  try {
+    const res = await fetch(primaryUrl, options);
+    return res;
+  } catch (err) {
+    // If the proxied request failed due to a network connection error (e.g. Failed to fetch),
+    // try the direct URL to port 5000
+    if (primaryBase !== DIRECT_API_URL) {
+      try {
+        const directUrl = `${DIRECT_API_URL}/${cleanPath}`;
+        return await fetch(directUrl, options);
+      } catch {
+        throw new Error('RecallMe backend server is not running on port 5000. Please start it using start-backend.bat or npm run backend, then retry.');
+      }
+    }
+    throw new Error('RecallMe backend server is not running on port 5000. Please start it using start-backend.bat or npm run backend, then retry.');
+  }
+}
 
 function getActiveUserId() {
   try {
@@ -21,7 +64,7 @@ function getActiveUserId() {
 
 export async function apiSignup(name, email, password) {
   try {
-    const res = await fetch(`${API_BASE_URL}/auth/signup`, {
+    const res = await backendFetch('auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password }),
@@ -32,14 +75,14 @@ export async function apiSignup(name, email, password) {
       return { success: false, error: data.error || 'Failed to sign up' };
     }
     return { success: true, user: data.user };
-  } catch (err) {
+  } catch {
     return { success: false, error: 'Backend unreachable', offline: true };
   }
 }
 
 export async function apiLogin(email, password) {
   try {
-    const res = await fetch(`${API_BASE_URL}/auth/login`, {
+    const res = await backendFetch('auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -50,18 +93,18 @@ export async function apiLogin(email, password) {
       return { success: false, error: data.error || 'Login failed' };
     }
     return { success: true, user: data.user };
-  } catch (err) {
+  } catch {
     return { success: false, error: 'Backend unreachable', offline: true };
   }
 }
 
 export async function checkBackendHealth() {
   try {
-    const res = await fetch(`${API_BASE_URL}/health`, { signal: AbortSignal.timeout(2000) });
+    const res = await backendFetch('health', { signal: AbortSignal.timeout(2000) });
     if (res.ok) {
       return await res.json();
     }
-  } catch (err) {
+  } catch {
     // backend offline
   }
   return null;
@@ -76,7 +119,7 @@ export async function generateStudyMaterial(text, title = '', subject = '', opti
   const saveToDb = Boolean(options && options.saveToDb);
 
   try {
-    const res = await fetch(`${API_BASE_URL}/generate`, {
+    const res = await backendFetch('generate', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
@@ -111,10 +154,10 @@ export async function generateStudyMaterial(text, title = '', subject = '', opti
 export async function fetchTopics() {
   const userId = getActiveUserId();
   try {
-    const url = userId ? `${API_BASE_URL}/topics?userId=${encodeURIComponent(userId)}` : `${API_BASE_URL}/topics`;
-    const res = await fetch(url, { 
+    const path = userId ? `topics?userId=${encodeURIComponent(userId)}` : 'topics';
+    const res = await backendFetch(path, { 
       headers: userId ? { 'x-user-id': userId } : {},
-      signal: AbortSignal.timeout(3000) 
+      signal: AbortSignal.timeout(4000) 
     });
     if (res.ok) {
       return await res.json();
@@ -127,8 +170,8 @@ export async function fetchTopics() {
 
 export async function fetchTopicById(id) {
   try {
-    const res = await fetch(`${API_BASE_URL}/topics/${encodeURIComponent(id)}`, {
-      signal: AbortSignal.timeout(3000)
+    const res = await backendFetch(`topics/${encodeURIComponent(id)}`, {
+      signal: AbortSignal.timeout(4000)
     });
     if (res.ok) {
       return await res.json();
@@ -141,14 +184,14 @@ export async function fetchTopicById(id) {
 
 export async function persistTopic(topic) {
   const userId = getActiveUserId();
-  const res = await fetch(`${API_BASE_URL}/topics`, {
+  const res = await backendFetch('topics', {
     method: 'POST',
     headers: { 
       'Content-Type': 'application/json',
       ...(userId ? { 'x-user-id': userId } : {})
     },
     body: JSON.stringify({ ...topic, userId: topic.userId || userId }),
-    signal: AbortSignal.timeout(6000)
+    signal: AbortSignal.timeout(8000)
   });
 
   if (!res.ok) {
@@ -161,9 +204,9 @@ export async function persistTopic(topic) {
 
 export async function toggleTopicStarBackend(topicId) {
   try {
-    const res = await fetch(`${API_BASE_URL}/topics/${topicId}/star`, {
+    const res = await backendFetch(`topics/${topicId}/star`, {
       method: 'PUT',
-      signal: AbortSignal.timeout(3000)
+      signal: AbortSignal.timeout(4000)
     });
     if (res.ok) {
       return await res.json();
@@ -176,9 +219,9 @@ export async function toggleTopicStarBackend(topicId) {
 
 export async function deleteTopicBackend(topicId) {
   try {
-    const res = await fetch(`${API_BASE_URL}/topics/${topicId}`, {
+    const res = await backendFetch(`topics/${topicId}`, {
       method: 'DELETE',
-      signal: AbortSignal.timeout(3000)
+      signal: AbortSignal.timeout(4000)
     });
     if (res.ok) {
       return await res.json();
@@ -192,15 +235,15 @@ export async function deleteTopicBackend(topicId) {
 export async function fetchQuizHistory() {
   const userId = getActiveUserId();
   try {
-    const url = userId ? `${API_BASE_URL}/quiz/history?userId=${encodeURIComponent(userId)}` : `${API_BASE_URL}/quiz/history`;
-    const res = await fetch(url, { 
+    const path = userId ? `quiz/history?userId=${encodeURIComponent(userId)}` : 'quiz/history';
+    const res = await backendFetch(path, { 
       headers: userId ? { 'x-user-id': userId } : {},
-      signal: AbortSignal.timeout(3000) 
+      signal: AbortSignal.timeout(4000) 
     });
     if (res.ok) {
       return await res.json();
     }
-  } catch (err) {
+  } catch {
     console.warn('[API] Could not fetch quiz history from backend, using local state.');
   }
   return [];
@@ -209,14 +252,14 @@ export async function fetchQuizHistory() {
 export async function recordQuizAttempt(attempt) {
   const userId = getActiveUserId();
   try {
-    const res = await fetch(`${API_BASE_URL}/quiz/attempt`, {
+    const res = await backendFetch('quiz/attempt', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
         ...(userId ? { 'x-user-id': userId } : {})
       },
       body: JSON.stringify({ ...attempt, userId: attempt.userId || userId }),
-      signal: AbortSignal.timeout(3000)
+      signal: AbortSignal.timeout(4000)
     });
     if (res.ok) {
       return await res.json();
@@ -232,7 +275,7 @@ export async function recordQuizAttempt(attempt) {
  */
 export async function generateQuizFromNotesApi({ noteIds = [], notes = [], difficulty = 'Medium', count = 5 }) {
   const userId = getActiveUserId();
-  const res = await fetch(`${API_BASE_URL}/quiz/generate`, {
+  const res = await backendFetch('quiz/generate', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

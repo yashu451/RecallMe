@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import MarkdownRenderer, { cleanHeading, renderInlineMarkdown } from '../common/MarkdownRenderer';
 import { 
   ArrowLeft, 
   BookOpen, 
@@ -289,9 +290,9 @@ export default function StudyMaterialView({
           {topic.title}
         </h1>
 
-        <p className="text-sm sm:text-base text-[#706B66] leading-relaxed max-w-3xl">
-          {topic.summary}
-        </p>
+        <div className="text-sm sm:text-base text-[#706B66] leading-relaxed max-w-3xl">
+          {renderInlineMarkdown(topic.summary)}
+        </div>
 
         {/* Tags */}
         {topic.tags && topic.tags.length > 0 && (
@@ -319,7 +320,7 @@ export default function StudyMaterialView({
             {topic.takeaways.map((takeaway, i) => (
               <li key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#252525] leading-relaxed">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#C65D32] mt-2 shrink-0"></span>
-                <span>{takeaway}</span>
+                <span className="flex-1">{renderInlineMarkdown(takeaway)}</span>
               </li>
             ))}
           </ul>
@@ -352,10 +353,10 @@ export default function StudyMaterialView({
               className="bg-white border border-[#E7E0D8] rounded-2xl p-6 sm:p-8 shadow-card space-y-4"
             >
               <h2 className="text-lg sm:text-xl font-bold text-[#222222] tracking-tight pb-2 border-b border-[#E7E0D8]">
-                {section.heading}
+                {cleanHeading(section.heading)}
               </h2>
-              <div className="prose prose-sm max-w-none text-xs sm:text-sm text-[#252525] leading-relaxed space-y-3 whitespace-pre-line font-sans">
-                {section.content}
+              <div className="text-xs sm:text-sm text-[#252525] leading-relaxed font-sans">
+                <MarkdownRenderer content={section.content} />
               </div>
             </article>
           ))}
