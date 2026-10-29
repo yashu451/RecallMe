@@ -5,21 +5,22 @@
 @layer base {
   html {
     color-scheme: light;
+    scroll-behavior: smooth;
   }
   
   body {
-    background-color: #FAF9F5;
-    color: #171717;
+    background-color: #F8FAFC;
+    color: #0F172A;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   ::selection {
-    background-color: #E0E7FE;
-    color: #262366;
+    background-color: #E0E7FF;
+    color: #3730A3;
   }
 }
 
-/* Custom editorial scrollbar */
+/* Crisp SaaS modern scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -30,23 +31,21 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D5D1C4;
+  background: #CBD5E1;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9C9B94;
+  background: #94A3B8;
 }
 
-/* Editorial subtle underline animation and helper */
-.editorial-link {
-  background-image: linear-gradient(#3730A3, #3730A3);
-  background-position: 0% 100%;
-  background-repeat: no-repeat;
-  background-size: 0% 1px;
-  transition: background-size 0.2s ease-in-out;
-}
-.editorial-link:hover {
-  background-size: 100% 1px;
+/* Subtle gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, #4F46E5 0%, #2563EB 50%, #06B6D4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
+.gradient-brand {
+  background: linear-gradient(135deg, #4F46E5 0%, #3B82F6 100%);
+}

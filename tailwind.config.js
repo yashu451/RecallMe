@@ -7,52 +7,38 @@ export default {
   theme: {
     extend: {
       colors: {
-        paper: {
-          50: '#FDFCF9',
-          100: '#FAF9F5',
-          200: '#F4F2EC',
-          300: '#E9E6DC',
-          400: '#D5D1C4',
-        },
-        charcoal: {
-          900: '#171717',
-          800: '#232321',
-          700: '#383835',
-          600: '#52524E',
-          500: '#73736C',
-          400: '#9C9B94',
-        },
-        indigo: {
-          50: '#F0F3FF',
-          100: '#E0E7FE',
+        brand: {
+          50: '#EEF2FF',
+          100: '#E0E7FF',
           200: '#C7D2FE',
-          500: '#4F46E5',
-          600: '#4338CA',
-          700: '#3730A3',
-          800: '#312E81',
-          900: '#262366',
-          950: '#1A1847',
+          300: '#A5B4FC',
+          400: '#818CF8',
+          500: '#6366F1',
+          600: '#4F46E5', // vibrant primary
+          700: '#4338CA',
+          800: '#3730A3',
+          900: '#312E81',
+          950: '#1E1B4B',
         },
-        border: {
-          light: '#EBE9E1',
-          DEFAULT: '#E2E0D8',
-          strong: '#C9C6BC',
+        navy: {
+          50: '#F8FAFC',
+          100: '#F1F5F9',
+          200: '#E2E8F0',
+          700: '#334155',
+          800: '#1E293B',
+          900: '#0F172A',
+          950: '#0A0F1D',
         }
       },
       fontFamily: {
         sans: [
           '"Plus Jakarta Sans"',
+          'Inter',
           '-apple-system',
           'BlinkMacSystemFont',
           '"Segoe UI"',
           'Roboto',
           'sans-serif',
-        ],
-        serif: [
-          'Newsreader',
-          'Charter',
-          'Georgia',
-          'serif',
         ],
         mono: [
           'ui-monospace',
@@ -64,8 +50,10 @@ export default {
         ],
       },
       boxShadow: {
-        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.04)',
-        'elevated': '0 4px 16px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.02)',
+        'subtle': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+        'elevated': '0 10px 25px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03)',
+        'popover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
       }
     },
   },

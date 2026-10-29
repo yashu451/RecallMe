@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
-import Sidebar from './components/layout/Sidebar';
-import MobileNav from './components/layout/MobileNav';
+import { BrowserRouter, Routes, Route, Navigate, useParams, useNavigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Navbar from './components/layout/Navbar';
+import LandingPage from './components/landing/LandingPage';
+import LoginPage from './components/auth/LoginPage';
+import SignupPage from './components/auth/SignupPage';
 import HomeDashboard from './components/dashboard/HomeDashboard';
 import CreateView from './components/create/CreateView';
 import StudyMaterialView from './components/study/StudyMaterialView';
@@ -12,26 +16,58 @@ import QuizHistoryView from './components/quiz/QuizHistoryView';
 import { INITIAL_TOPICS, INITIAL_QUIZ_HISTORY } from './data/mockData';
 import { generateStudyMaterialFromText } from './utils/studyGenerator';
 
+// Wrapper to find topic by ID for Study view
+function StudyRouteWrapper({ topics, onStartQuiz, onToggleStar }) {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const topic = topics.find(t => t.id === id) || topics[0];
+
+  return (
+    <StudyMaterialView 
+      topic={topic}
+      onBack={() => navigate('/library')}
+      onStartQuiz={onStartQuiz}
+      onToggleStar={onToggleStar}
+    />
+  );
+}
+
+// Wrapper to find topic by ID for Quiz view
+function QuizRouteWrapper({ topics, onCompleteQuiz }) {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const topic = topics.find(t => t.id === id) || topics[0];
+
+  return (
+    <RecallQuizView 
+      topic={topic}
+      onCompleteQuiz={onCompleteQuiz}
+      onExitQuiz={() => navigate(`/study/${topic?.id || ''}`)}
+    />
+  );
+}
+
+// Protected Route helper
+function ProtectedRoute({ children }) {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+}
+
 export default function App() {
-  const [currentView, setCurrentView] = useState('home'); // 'home' | 'create' | 'study' | 'quiz' | 'results' | 'library' | 'history'
   const [topics, setTopics] = useState(INITIAL_TOPICS);
   const [activeTopicId, setActiveTopicId] = useState(INITIAL_TOPICS[0].id);
   const [quizHistory, setQuizHistory] = useState(INITIAL_QUIZ_HISTORY);
   const [latestQuizResult, setLatestQuizResult] = useState(null);
-  const [initialCreateText, setInitialCreateText] = useState('');
+  const [quickInputDraft, setQuickInputDraft] = useState('');
 
-  // Active topic object
   const activeTopic = topics.find(t => t.id === activeTopicId) || topics[0];
 
-  // Actions
   const handleSelectTopic = (topic) => {
     setActiveTopicId(topic.id);
-    setCurrentView('study');
   };
 
   const handleStartQuiz = (topic) => {
     setActiveTopicId(topic.id);
-    setCurrentView('quiz');
   };
 
   const handleCompleteQuiz = (result) => {
@@ -49,7 +85,7 @@ export default function App() {
       return t;
     }));
 
-    // Add to history
+    // Add to quiz history
     const historyEntry = {
       id: 'hist-' + Date.now(),
       topicId: result.topicId,
@@ -65,21 +101,15 @@ export default function App() {
         : 'Review suggested on highlighted questions.'
     };
     setQuizHistory(prev => [historyEntry, ...prev]);
-
-    setCurrentView('results');
   };
 
   const handleGenerate = (rawText, userTitle, options) => {
     const newTopic = generateStudyMaterialFromText(rawText, userTitle, options);
     setTopics(prev => [newTopic, ...prev]);
     setActiveTopicId(newTopic.id);
-    setInitialCreateText('');
-    setCurrentView('study');
-  };
-
-  const handleCreateFromQuickInput = (text) => {
-    setInitialCreateText(text);
-    setCurrentView('create');
+    setQuickInputDraft('');
+    window.location.hash = '';
+    return newTopic;
   };
 
   const handleToggleStar = (topicId) => {
@@ -104,105 +134,133 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F5] text-charcoal-900 flex flex-col md:flex-row antialiased">
-      {/* Desktop Sidebar Navigation */}
-      <Sidebar 
-        currentView={currentView}
-        setCurrentView={(view) => {
-          if (view === 'create') setInitialCreateText('');
-          setCurrentView(view);
-        }}
-        libraryCount={topics.length}
-      />
+    <AuthProvider>
+      <BrowserRouter>
+        <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col antialiased font-sans">
+          {/* Polished Top Navigation */}
+          <Navbar />
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
-        {/* Mobile Navigation Bar */}
-        <MobileNav 
-          currentView={currentView}
-          setCurrentView={(view) => {
-            if (view === 'create') setInitialCreateText('');
-            setCurrentView(view);
-          }}
-          libraryCount={topics.length}
-        />
+          {/* Main Content Area */}
+          <main className="flex-1">
+            <Routes>
+              {/* Public Marketing / Auth Routes */}
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
 
-        {/* View Router */}
-        <main className="flex-1 overflow-y-auto">
-          {currentView === 'home' && (
-            <HomeDashboard 
-              topics={topics}
-              onSelectTopic={handleSelectTopic}
-              onStartQuiz={handleStartQuiz}
-              onCreateFromQuickInput={handleCreateFromQuickInput}
-              setCurrentView={setCurrentView}
-            />
-          )}
+              {/* Application Dashboard */}
+              <Route 
+                path="/dashboard" 
+                element={
+                  <ProtectedRoute>
+                    <HomeDashboard 
+                      topics={topics}
+                      onSelectTopic={handleSelectTopic}
+                      onStartQuiz={handleStartQuiz}
+                      onCreateFromQuickInput={(text) => setQuickInputDraft(text)}
+                    />
+                  </ProtectedRoute>
+                } 
+              />
 
-          {currentView === 'create' && (
-            <CreateView 
-              initialText={initialCreateText}
-              onGenerate={handleGenerate}
-              onCancel={() => setCurrentView('home')}
-            />
-          )}
+              {/* Create Material */}
+              <Route 
+                path="/create" 
+                element={
+                  <ProtectedRoute>
+                    <CreateView 
+                      initialText={quickInputDraft}
+                      onGenerate={(rawText, title, options) => {
+                        const created = handleGenerate(rawText, title, options);
+                        window.location.href = `/study/${created.id}`;
+                      }}
+                      onCancel={() => window.location.href = '/dashboard'}
+                    />
+                  </ProtectedRoute>
+                } 
+              />
 
-          {currentView === 'study' && activeTopic && (
-            <StudyMaterialView 
-              topic={activeTopic}
-              onBack={() => setCurrentView('library')}
-              onStartQuiz={handleStartQuiz}
-              onToggleStar={handleToggleStar}
-            />
-          )}
+              {/* Study Material View */}
+              <Route 
+                path="/study/:id" 
+                element={
+                  <ProtectedRoute>
+                    <StudyRouteWrapper 
+                      topics={topics}
+                      onStartQuiz={handleStartQuiz}
+                      onToggleStar={handleToggleStar}
+                    />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/study" 
+                element={<Navigate to={`/study/${activeTopic?.id || topics[0].id}`} replace />} 
+              />
 
-          {currentView === 'quiz' && activeTopic && (
-            <RecallQuizView 
-              topic={activeTopic}
-              onCompleteQuiz={handleCompleteQuiz}
-              onExitQuiz={() => setCurrentView('study')}
-            />
-          )}
+              {/* Active Recall Quiz */}
+              <Route 
+                path="/quiz/:id" 
+                element={
+                  <ProtectedRoute>
+                    <QuizRouteWrapper 
+                      topics={topics}
+                      onCompleteQuiz={handleCompleteQuiz}
+                    />
+                  </ProtectedRoute>
+                } 
+              />
 
-          {currentView === 'results' && latestQuizResult && (
-            <QuizResultsView 
-              result={latestQuizResult}
-              onRetryQuiz={() => setCurrentView('quiz')}
-              onReviewNotes={() => setCurrentView('study')}
-              onGoLibrary={() => setCurrentView('library')}
-            />
-          )}
+              {/* Quiz Results */}
+              <Route 
+                path="/results" 
+                element={
+                  <ProtectedRoute>
+                    <QuizResultsView 
+                      result={latestQuizResult}
+                      onRetryQuiz={() => {}}
+                      onReviewNotes={() => {}}
+                    />
+                  </ProtectedRoute>
+                } 
+              />
 
-          {currentView === 'library' && (
-            <LibraryView 
-              topics={topics}
-              onSelectTopic={handleSelectTopic}
-              onStartQuiz={handleStartQuiz}
-              onToggleStar={handleToggleStar}
-              onDeleteTopic={handleDeleteTopic}
-              onCreateNew={() => {
-                setInitialCreateText('');
-                setCurrentView('create');
-              }}
-            />
-          )}
+              {/* My Library */}
+              <Route 
+                path="/library" 
+                element={
+                  <ProtectedRoute>
+                    <LibraryView 
+                      topics={topics}
+                      onSelectTopic={handleSelectTopic}
+                      onStartQuiz={handleStartQuiz}
+                      onToggleStar={handleToggleStar}
+                      onDeleteTopic={handleDeleteTopic}
+                    />
+                  </ProtectedRoute>
+                } 
+              />
 
-          {currentView === 'history' && (
-            <QuizHistoryView 
-              quizHistory={quizHistory}
-              onRetakeTopic={(topicId) => {
-                setActiveTopicId(topicId);
-                setCurrentView('quiz');
-              }}
-              onReviewTopic={(topicId) => {
-                setActiveTopicId(topicId);
-                setCurrentView('study');
-              }}
-            />
-          )}
-        </main>
-      </div>
-    </div>
+              {/* Quiz History */}
+              <Route 
+                path="/history" 
+                element={
+                  <ProtectedRoute>
+                    <QuizHistoryView 
+                      quizHistory={quizHistory}
+                      onRetakeTopic={(id) => setActiveTopicId(id)}
+                      onReviewTopic={(id) => setActiveTopicId(id)}
+                    />
+                  </ProtectedRoute>
+                } 
+              />
+
+              {/* Catch-all redirect */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </main>
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
-

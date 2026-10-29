@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Sparkles, 
   ArrowLeft, 
@@ -8,14 +9,14 @@ import {
   CheckSquare, 
   Square, 
   ArrowRight, 
-  Loader2,
-  Bookmark,
-  Trash2,
-  FileCheck
+  Loader2, 
+  Trash2, 
+  Layers
 } from 'lucide-react';
 import { SAMPLE_TEXTS_FOR_CREATOR } from '../../data/mockData';
 
 export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
+  const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [subject, setSubject] = useState('Machine Learning');
   const [text, setText] = useState(initialText);
@@ -49,10 +50,10 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
     if (!text.trim()) return;
 
     setIsGenerating(true);
-    setGenerationStep('Synthesizing core conceptual hierarchy...');
+    setGenerationStep('Extracting core principles & hierarchical sections...');
 
     setTimeout(() => {
-      setGenerationStep('Extracting key definitions & invariant terms...');
+      setGenerationStep('Isolating domain invariants & terminology...');
     }, 600);
 
     setTimeout(() => {
@@ -66,35 +67,37 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8 space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#E8E6DE] pb-4">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
+      
+      {/* Top Header */}
+      <div className="flex items-center justify-between border-b border-slate-200/80 pb-4">
         <button
-          onClick={onCancel}
-          className="text-xs font-medium text-charcoal-500 hover:text-charcoal-900 flex items-center gap-1.5 transition-colors"
+          onClick={onCancel || (() => navigate('/dashboard'))}
+          className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1.5 transition-colors"
         >
           <ArrowLeft size={14} />
           <span>Back to Dashboard</span>
         </button>
 
-        <div className="text-xs font-mono text-charcoal-400">
+        <div className="text-xs font-mono text-slate-400 bg-slate-100 px-2.5 py-1 rounded-md">
           Distraction-Free Editor
         </div>
       </div>
 
-      <div className="space-y-2">
-        <h1 className="font-serif text-3xl text-charcoal-900 font-normal tracking-tight">
+      <div className="space-y-1.5">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
           Create Study Material
         </h1>
-        <p className="text-sm text-charcoal-600 leading-relaxed">
+        <p className="text-sm text-slate-600 leading-relaxed">
           Paste your lecture transcript, textbook chapter, or research paper excerpt. RecallMe extracts structured summaries, key terminology, and an active recall quiz.
         </p>
       </div>
 
-      {/* Preset Sample Buttons */}
-      <div className="p-3 bg-[#F5F3EC] rounded-md border border-[#E6E3D8] space-y-2">
-        <div className="text-xs font-medium text-charcoal-700 flex items-center gap-2">
-          <span>Or test with a pre-configured realistic academic excerpt:</span>
+      {/* Preset Sample Excerpts */}
+      <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
+        <div className="text-xs font-bold text-slate-700 flex items-center gap-2">
+          <Sparkles size={14} className="text-indigo-600" />
+          <span>Or load a pre-configured realistic academic excerpt:</span>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {SAMPLE_TEXTS_FOR_CREATOR.map((sample, idx) => (
@@ -102,7 +105,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
               key={idx}
               type="button"
               onClick={() => handleLoadSample(sample)}
-              className="text-xs px-2.5 py-1 rounded bg-[#FFFFFF] hover:bg-[#FAF9F5] text-charcoal-800 border border-[#DCD9CE] transition-colors font-medium shadow-xs"
+              className="text-xs px-3 py-1.5 rounded-lg bg-white hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 border border-slate-200 hover:border-indigo-200 transition-all font-semibold shadow-xs"
             >
               Load: {sample.label}
             </button>
@@ -114,27 +117,27 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
         
         {/* Title & Subject row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="sm:col-span-2 space-y-1">
-            <label className="text-xs font-semibold text-charcoal-700 uppercase tracking-wider block">
-              Topic Title <span className="font-normal text-charcoal-400">(Optional - auto-inferred if blank)</span>
+          <div className="sm:col-span-2 space-y-1.5">
+            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+              Topic Title <span className="font-normal text-slate-400">(Auto-inferred if blank)</span>
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g., Cellular Respiration & Chemiosmosis"
-              className="w-full text-sm bg-white border border-[#E2E0D8] rounded-md px-3.5 py-2 text-charcoal-900 focus:outline-none focus:ring-2 focus:ring-[#312E81] focus:border-transparent font-sans"
+              className="w-full text-sm bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent font-sans shadow-xs"
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-charcoal-700 uppercase tracking-wider block">
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
               Academic Domain
             </label>
             <select
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="w-full text-sm bg-white border border-[#E2E0D8] rounded-md px-3 py-2 text-charcoal-900 focus:outline-none focus:ring-2 focus:ring-[#312E81] focus:border-transparent"
+              className="w-full text-sm bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 font-sans shadow-xs"
             >
               <option value="Machine Learning">Machine Learning</option>
               <option value="Cognitive Science">Cognitive Science</option>
@@ -150,10 +153,10 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
         {/* Source Content Textarea */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-semibold text-charcoal-700 uppercase tracking-wider block">
+            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
               Source Material / Reading Notes
             </label>
-            <div className="text-xs font-mono text-charcoal-500">
+            <div className="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
               {wordCount} words • ~{estimatedReadTime} min read
             </div>
           </div>
@@ -164,7 +167,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Paste raw lecture excerpts, article text, or syllabus concepts here...&#10;&#10;Supports raw text, bullet points, and mathematical or scientific terminology."
-              className="w-full text-sm font-sans text-charcoal-900 placeholder:text-charcoal-400 bg-white border border-[#E2E0D8] rounded-md p-4 focus:outline-none focus:ring-2 focus:ring-[#312E81] focus:border-transparent leading-relaxed resize-y font-mono text-xs sm:text-sm"
+              className="w-full text-sm font-sans text-slate-900 placeholder:text-slate-400 bg-white border border-slate-200 rounded-2xl p-4 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent leading-relaxed resize-y shadow-xs"
               required
             />
           </div>
@@ -174,7 +177,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
               <button
                 type="button"
                 onClick={() => setText('')}
-                className="text-xs text-charcoal-500 hover:text-rose-700 flex items-center gap-1 transition-colors pt-0.5"
+                className="text-xs text-slate-400 hover:text-rose-600 flex items-center gap-1 transition-colors pt-0.5 font-medium"
               >
                 <Trash2 size={12} />
                 <span>Clear text</span>
@@ -183,14 +186,14 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
           )}
         </div>
 
-        {/* What to generate section */}
-        <div className="border border-[#E2E0D8] rounded-md bg-[#FAF9F5] p-5 space-y-3">
+        {/* What to generate options */}
+        <div className="border border-slate-200 rounded-2xl bg-slate-50/60 p-5 sm:p-6 space-y-3">
           <div className="space-y-0.5">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-charcoal-700">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
               What should RecallMe generate?
             </h3>
-            <p className="text-xs text-charcoal-500">
-              Select the study components tailored to your learning workflow.
+            <p className="text-xs text-slate-500">
+              Customize the active recall deck based on your study session requirements.
             </p>
           </div>
 
@@ -198,72 +201,72 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
             {/* Notes */}
             <div 
               onClick={() => toggleOption('notes')}
-              className={`p-3 rounded border text-left cursor-pointer transition-colors flex items-start gap-2.5 ${
+              className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex items-start gap-3 ${
                 options.notes 
-                  ? 'bg-white border-[#312E81] ring-1 ring-[#312E81]/30' 
-                  : 'bg-[#F2EFE8] border-[#E2DFD6] opacity-60'
+                  ? 'bg-white border-indigo-600 ring-1 ring-indigo-600 shadow-sm' 
+                  : 'bg-slate-100 border-slate-200 opacity-60'
               }`}
             >
-              <div className="mt-0.5 text-[#312E81]">
-                {options.notes ? <CheckSquare size={16} /> : <Square size={16} />}
+              <div className="mt-0.5 text-indigo-600">
+                {options.notes ? <CheckSquare size={17} /> : <Square size={17} />}
               </div>
               <div>
-                <div className="text-xs font-semibold text-charcoal-900">Structured Study Notes</div>
-                <div className="text-[11px] text-charcoal-500">Organized headings, takeaways, and conceptual synthesis.</div>
+                <div className="text-xs font-bold text-slate-900">Structured Study Notes</div>
+                <div className="text-[11px] text-slate-500">Organized headings, takeaways, and conceptual synthesis.</div>
               </div>
             </div>
 
             {/* Keywords */}
             <div 
               onClick={() => toggleOption('keywords')}
-              className={`p-3 rounded border text-left cursor-pointer transition-colors flex items-start gap-2.5 ${
+              className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex items-start gap-3 ${
                 options.keywords 
-                  ? 'bg-white border-[#312E81] ring-1 ring-[#312E81]/30' 
-                  : 'bg-[#F2EFE8] border-[#E2DFD6] opacity-60'
+                  ? 'bg-white border-indigo-600 ring-1 ring-indigo-600 shadow-sm' 
+                  : 'bg-slate-100 border-slate-200 opacity-60'
               }`}
             >
-              <div className="mt-0.5 text-[#312E81]">
-                {options.keywords ? <CheckSquare size={16} /> : <Square size={16} />}
+              <div className="mt-0.5 text-indigo-600">
+                {options.keywords ? <CheckSquare size={17} /> : <Square size={17} />}
               </div>
               <div>
-                <div className="text-xs font-semibold text-charcoal-900">Key Concepts & Terms</div>
-                <div className="text-[11px] text-charcoal-500">Interactive inline highlights with detailed explanations.</div>
+                <div className="text-xs font-bold text-slate-900">Key Concepts & Terms</div>
+                <div className="text-[11px] text-slate-500">Interactive inline highlights with detailed explanations.</div>
               </div>
             </div>
 
             {/* Definitions */}
             <div 
               onClick={() => toggleOption('definitions')}
-              className={`p-3 rounded border text-left cursor-pointer transition-colors flex items-start gap-2.5 ${
+              className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex items-start gap-3 ${
                 options.definitions 
-                  ? 'bg-white border-[#312E81] ring-1 ring-[#312E81]/30' 
-                  : 'bg-[#F2EFE8] border-[#E2DFD6] opacity-60'
+                  ? 'bg-white border-indigo-600 ring-1 ring-indigo-600 shadow-sm' 
+                  : 'bg-slate-100 border-slate-200 opacity-60'
               }`}
             >
-              <div className="mt-0.5 text-[#312E81]">
-                {options.definitions ? <CheckSquare size={16} /> : <Square size={16} />}
+              <div className="mt-0.5 text-indigo-600">
+                {options.definitions ? <CheckSquare size={17} /> : <Square size={17} />}
               </div>
               <div>
-                <div className="text-xs font-semibold text-charcoal-900">Glossary & Definitions</div>
-                <div className="text-[11px] text-charcoal-500">Etymologies, precise meanings, and practical examples.</div>
+                <div className="text-xs font-bold text-slate-900">Glossary & Definitions</div>
+                <div className="text-[11px] text-slate-500">Etymologies, precise meanings, and practical examples.</div>
               </div>
             </div>
 
             {/* Quiz */}
             <div 
               onClick={() => toggleOption('quiz')}
-              className={`p-3 rounded border text-left cursor-pointer transition-colors flex items-start gap-2.5 ${
+              className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex items-start gap-3 ${
                 options.quiz 
-                  ? 'bg-white border-[#312E81] ring-1 ring-[#312E81]/30' 
-                  : 'bg-[#F2EFE8] border-[#E2DFD6] opacity-60'
+                  ? 'bg-white border-indigo-600 ring-1 ring-indigo-600 shadow-sm' 
+                  : 'bg-slate-100 border-slate-200 opacity-60'
               }`}
             >
-              <div className="mt-0.5 text-[#312E81]">
-                {options.quiz ? <CheckSquare size={16} /> : <Square size={16} />}
+              <div className="mt-0.5 text-indigo-600">
+                {options.quiz ? <CheckSquare size={17} /> : <Square size={17} />}
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-charcoal-900">Active Recall Quiz</span>
+                  <span className="text-xs font-bold text-slate-900">Active Recall Quiz</span>
                   {options.quiz && (
                     <select
                       value={options.quizCount}
@@ -271,7 +274,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
                         e.stopPropagation();
                         setOptions(prev => ({ ...prev, quizCount: Number(e.target.value) }));
                       }}
-                      className="text-[11px] font-mono border border-[#D5D1C4] rounded px-1.5 py-0.5 bg-white text-charcoal-800"
+                      className="text-[11px] font-mono border border-slate-300 rounded px-2 py-0.5 bg-white text-slate-800"
                     >
                       <option value={3}>3 Questions</option>
                       <option value={5}>5 Questions</option>
@@ -279,31 +282,31 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
                     </select>
                   )}
                 </div>
-                <div className="text-[11px] text-charcoal-500">Multiple-choice retrieval testing with explanations.</div>
+                <div className="text-[11px] text-slate-500">Retrieval testing with explanations.</div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Submit / Progress State */}
+        {/* Action Button & Progress */}
         <div className="pt-2">
           {isGenerating ? (
-            <div className="p-4 bg-[#EEF2FF] border border-[#C7D2FE] rounded-md flex items-center gap-3">
-              <Loader2 size={18} className="animate-spin text-[#312E81]" />
+            <div className="p-5 bg-indigo-50 border border-indigo-200 rounded-2xl flex items-center gap-3.5 animate-fadeIn">
+              <Loader2 size={20} className="animate-spin text-indigo-600 shrink-0" />
               <div className="space-y-0.5">
-                <div className="text-xs font-semibold text-[#1E1B4B]">Generating Study Deck...</div>
-                <div className="text-xs text-[#312E81] font-mono">{generationStep}</div>
+                <div className="text-xs font-bold text-indigo-900">Synthesizing Learning Material...</div>
+                <div className="text-xs text-indigo-700 font-mono">{generationStep}</div>
               </div>
             </div>
           ) : (
             <div className="flex items-center justify-between gap-4">
-              <span className="text-xs text-charcoal-500 font-serif italic hidden sm:inline">
-                "Active retrieval strengthens synaptic pathways 300% more than re-reading."
+              <span className="text-xs text-slate-500 hidden sm:inline font-medium">
+                "Active retrieval strengthens memory 3x more than passive re-reading."
               </span>
               <button
                 type="submit"
                 disabled={!text.trim()}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-md bg-[#312E81] hover:bg-[#282566] text-white text-xs font-semibold tracking-wide shadow-xs transition-colors flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold tracking-wide shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <span>Generate Study Material</span>
                 <ArrowRight size={14} />
@@ -316,4 +319,3 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
     </div>
   );
 }
-

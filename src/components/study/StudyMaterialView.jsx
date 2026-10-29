@@ -1,19 +1,16 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
   BookOpen, 
   FileText, 
-  BookMarked, 
   CheckCircle2, 
   HelpCircle, 
-  Share2, 
   Copy, 
   Star, 
   ArrowRight,
   Sparkles,
-  Bookmark,
   Check,
-  Tag,
   Clock,
   Layers,
   Info,
@@ -24,9 +21,9 @@ export default function StudyMaterialView({
   topic, 
   onBack, 
   onStartQuiz, 
-  onToggleStar, 
-  onUpdateTopic 
+  onToggleStar 
 }) {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('notes'); // 'notes' | 'keywords' | 'definitions' | 'quizPreview'
   const [copied, setCopied] = useState(false);
   const [activeKeywordModal, setActiveKeywordModal] = useState(null);
@@ -63,13 +60,13 @@ export default function StudyMaterialView({
   ];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-8 py-8 space-y-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
       
       {/* Top Navigation Bar */}
-      <div className="flex items-center justify-between border-b border-[#E8E6DE] pb-4">
+      <div className="flex items-center justify-between border-b border-slate-200/80 pb-4">
         <button
-          onClick={onBack}
-          className="text-xs font-medium text-charcoal-500 hover:text-charcoal-900 flex items-center gap-1.5 transition-colors"
+          onClick={onBack || (() => navigate('/library'))}
+          className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1.5 transition-colors"
         >
           <ArrowLeft size={14} />
           <span>Back to Library</span>
@@ -79,29 +76,32 @@ export default function StudyMaterialView({
           {/* Star Bookmark */}
           <button
             onClick={() => onToggleStar(topic.id)}
-            className={`p-1.5 rounded border transition-colors ${
+            className={`p-2 rounded-lg border transition-all ${
               topic.isStarred
-                ? 'bg-amber-50 text-amber-700 border-amber-200'
-                : 'text-charcoal-400 hover:text-charcoal-700 bg-white border-[#E2E0D8]'
+                ? 'bg-amber-50 text-amber-600 border-amber-200'
+                : 'text-slate-400 hover:text-slate-700 bg-white border-slate-200'
             }`}
             title={topic.isStarred ? 'Saved to favorites' : 'Star this topic'}
           >
-            <Star size={14} className={topic.isStarred ? 'fill-amber-500' : ''} />
+            <Star size={15} className={topic.isStarred ? 'fill-amber-500' : ''} />
           </button>
 
           {/* Copy Markdown */}
           <button
             onClick={handleCopyMarkdown}
-            className="px-2.5 py-1 rounded text-xs font-medium text-charcoal-700 bg-white hover:bg-[#FAF9F5] border border-[#E2E0D8] transition-colors flex items-center gap-1.5 shadow-xs"
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition-colors flex items-center gap-1.5 shadow-xs"
           >
-            {copied ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
+            {copied ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
             <span>{copied ? 'Copied' : 'Export Notes'}</span>
           </button>
 
           {/* Start Recall Quiz */}
           <button
-            onClick={() => onStartQuiz(topic)}
-            className="px-3 py-1 rounded text-xs font-semibold text-white bg-[#312E81] hover:bg-[#282566] transition-colors flex items-center gap-1.5 shadow-xs"
+            onClick={() => {
+              onStartQuiz(topic);
+              navigate(`/quiz/${topic.id}`);
+            }}
+            className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-all flex items-center gap-1.5 shadow-xs hover:shadow-indigo-500/20"
           >
             <span>Take Recall Quiz</span>
             <ArrowRight size={13} />
@@ -109,34 +109,34 @@ export default function StudyMaterialView({
         </div>
       </div>
 
-      {/* Article Title & Metadata (Editorial Style) */}
-      <header className="space-y-4">
+      {/* Article Header & Metadata */}
+      <header className="space-y-3">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold px-2 py-0.5 rounded bg-[#F0EDE4] text-charcoal-800 border border-[#E5E2D8]">
+          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100">
             {topic.subject}
           </span>
           {topic.subjectCode && (
-            <span className="text-xs font-mono text-charcoal-500">
+            <span className="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
               {topic.subjectCode}
             </span>
           )}
-          <span className="text-charcoal-300">•</span>
-          <span className="text-xs text-charcoal-500 flex items-center gap-1">
-            <Clock size={12} />
+          <span className="text-slate-300">•</span>
+          <span className="text-xs text-slate-500 flex items-center gap-1 font-medium">
+            <Clock size={13} />
             {topic.readTime}
           </span>
-          <span className="text-charcoal-300">•</span>
-          <span className="text-xs text-charcoal-500">
+          <span className="text-slate-300">•</span>
+          <span className="text-xs text-slate-500">
             Last studied {topic.lastStudied}
           </span>
         </div>
 
-        <h1 className="font-serif text-3xl sm:text-4xl text-charcoal-900 font-normal tracking-tight leading-tight">
+        <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
           {topic.title}
         </h1>
 
-        <p className="text-base text-charcoal-600 font-serif italic leading-relaxed max-w-3xl">
-          "{topic.summary}"
+        <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl">
+          {topic.summary}
         </p>
 
         {/* Tags */}
@@ -145,7 +145,7 @@ export default function StudyMaterialView({
             {topic.tags.map((tag, idx) => (
               <span 
                 key={idx}
-                className="text-[11px] text-charcoal-600 bg-[#F4F2EC] px-2 py-0.5 rounded border border-[#E5E2D8]"
+                className="text-[11px] font-medium text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-md border border-slate-200/60"
               >
                 #{tag}
               </span>
@@ -154,23 +154,23 @@ export default function StudyMaterialView({
         )}
       </header>
 
-      {/* Editorial Navigation Tabs */}
-      <div className="border-b border-[#E2E0D8] flex items-center gap-6 text-sm">
+      {/* Modern Tabs */}
+      <div className="border-b border-slate-200 flex items-center gap-6 text-sm">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`pb-3 font-medium transition-colors relative text-xs sm:text-sm ${
+              className={`pb-3 font-semibold transition-all relative text-xs sm:text-sm ${
                 isActive
-                  ? 'text-[#312E81] font-semibold'
-                  : 'text-charcoal-500 hover:text-charcoal-900'
+                  ? 'text-indigo-600'
+                  : 'text-slate-500 hover:text-slate-900'
               }`}
             >
               <span>{tab.label}</span>
               {isActive && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#312E81]"></span>
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 rounded-full"></span>
               )}
             </button>
           );
@@ -179,22 +179,22 @@ export default function StudyMaterialView({
 
       {/* TAB 1: Structured Notes */}
       {activeTab === 'notes' && (
-        <div className="space-y-8 leading-relaxed text-charcoal-900">
+        <div className="space-y-8 leading-relaxed text-slate-900">
           
-          {/* Key Takeaways Callout (Quiet, editorial box) */}
+          {/* Key Takeaways Callout */}
           {topic.takeaways && topic.takeaways.length > 0 && (
-            <div className="p-5 bg-[#FAF9F5] border-l-3 border-l-[#312E81] border border-[#E8E6DE] rounded-r-md space-y-2">
-              <div className="text-xs font-semibold uppercase tracking-wider text-[#312E81] flex items-center gap-1.5">
-                <Sparkles size={14} />
-                <span>Executive Synthesis & Core Principles</span>
+            <div className="p-5 bg-indigo-50/70 border-l-4 border-l-indigo-600 border border-indigo-100 rounded-r-xl space-y-2">
+              <div className="text-xs font-bold uppercase tracking-wider text-indigo-900 flex items-center gap-1.5">
+                <Sparkles size={15} className="text-indigo-600" />
+                <span>Executive Synthesis & Invariant Principles</span>
               </div>
               <ul className="space-y-2 pt-1">
                 {topic.takeaways.map((takeaway, idx) => (
-                  <li key={idx} className="text-xs sm:text-sm text-charcoal-800 flex items-start gap-2.5">
-                    <span className="font-mono text-[#312E81] font-semibold text-xs mt-0.5">
+                  <li key={idx} className="text-xs sm:text-sm text-indigo-950 flex items-start gap-2.5">
+                    <span className="font-mono text-indigo-600 font-bold text-xs mt-0.5">
                       0{idx + 1}.
                     </span>
-                    <span className="leading-normal">{takeaway}</span>
+                    <span className="leading-relaxed">{takeaway}</span>
                   </li>
                 ))}
               </ul>
@@ -203,19 +203,19 @@ export default function StudyMaterialView({
 
           {/* Quick Clickable Term Inspector */}
           {topic.keywords && topic.keywords.length > 0 && (
-            <div className="p-3.5 bg-[#FAF9F5] border border-[#E8E6DE] rounded-md space-y-2">
-              <div className="text-xs font-mono uppercase tracking-wider text-charcoal-500 flex items-center justify-between">
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5">
+              <div className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center justify-between">
                 <span>Core Highlighted Terms in this topic (click for definition):</span>
-                <span className="text-[11px] text-charcoal-400">Interactive Glossary</span>
+                <span className="text-[11px] text-slate-400 font-normal">Interactive Glossary</span>
               </div>
               <div className="flex items-center gap-2 flex-wrap">
                 {topic.keywords.map((kw, i) => (
                   <button
                     key={i}
                     onClick={() => setActiveKeywordModal(kw)}
-                    className="text-xs px-2.5 py-1 rounded bg-white hover:bg-[#EEF2FF] text-charcoal-800 hover:text-[#312E81] border border-[#E0DDCF] hover:border-[#C7D2FE] transition-colors font-medium flex items-center gap-1.5 shadow-xs"
+                    className="text-xs px-3 py-1 rounded-lg bg-white hover:bg-indigo-50 text-slate-800 hover:text-indigo-700 border border-slate-200 hover:border-indigo-200 transition-all font-semibold flex items-center gap-1.5 shadow-xs"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#312E81]"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
                     <span>{kw.term}</span>
                   </button>
                 ))}
@@ -226,11 +226,11 @@ export default function StudyMaterialView({
           {/* Sectional content breakdown */}
           <div className="space-y-8 pt-2">
             {topic.sections?.map((section, idx) => (
-              <section key={idx} className="space-y-3">
-                <h2 className="font-serif text-xl sm:text-2xl text-charcoal-900 font-normal tracking-tight border-b border-[#EBE9E1] pb-2">
+              <section key={idx} className="space-y-3 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-subtle">
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight border-b border-slate-100 pb-2">
                   {section.heading}
                 </h2>
-                <div className="text-sm sm:text-base text-charcoal-700 leading-relaxed font-sans space-y-3 whitespace-pre-line">
+                <div className="text-sm sm:text-base text-slate-700 leading-relaxed font-sans space-y-3 whitespace-pre-line">
                   {section.content}
                 </div>
               </section>
@@ -238,16 +238,16 @@ export default function StudyMaterialView({
           </div>
 
           {/* Interactive Term Highlight Legend */}
-          <div className="p-4 bg-[#F5F3EC] border border-[#E6E3D8] rounded-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2 text-charcoal-700">
-              <Info size={15} className="text-[#312E81]" />
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2 text-slate-700">
+              <Info size={16} className="text-indigo-600 shrink-0" />
               <span>
                 Want to drill down into formal definitions? Explore the <strong>Glossary</strong> tab or inspect key terms.
               </span>
             </div>
             <button
               onClick={() => setActiveTab('definitions')}
-              className="text-[#312E81] hover:underline font-semibold self-start sm:self-auto"
+              className="text-indigo-600 hover:text-indigo-800 font-bold self-start sm:self-auto"
             >
               View all definitions →
             </button>
@@ -259,7 +259,7 @@ export default function StudyMaterialView({
       {/* TAB 2: Key Concepts */}
       {activeTab === 'keywords' && (
         <div className="space-y-4">
-          <div className="text-xs text-charcoal-500">
+          <div className="text-xs text-slate-500 font-medium">
             Core theoretical foundations, structural invariants, and mechanisms extracted from this material:
           </div>
 
@@ -267,18 +267,18 @@ export default function StudyMaterialView({
             {topic.keywords?.map((kw, idx) => (
               <div 
                 key={idx}
-                className="p-4 bg-white border border-[#E2E0D8] rounded-md shadow-subtle space-y-2 hover:border-[#312E81] transition-colors"
+                className="p-5 bg-white border border-slate-200 rounded-2xl shadow-subtle space-y-2 hover:border-indigo-300 transition-all"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-semibold uppercase px-2 py-0.5 rounded bg-[#EEF2FF] text-[#312E81]">
+                  <span className="text-xs font-mono font-bold uppercase px-2 py-0.5 rounded bg-indigo-50 text-indigo-700">
                     {kw.category}
                   </span>
-                  <span className="text-xs font-mono text-charcoal-400">#0{idx + 1}</span>
+                  <span className="text-xs font-mono text-slate-400">#0{idx + 1}</span>
                 </div>
-                <h3 className="font-serif text-lg font-medium text-charcoal-900">
+                <h3 className="text-base font-bold text-slate-900">
                   {kw.term}
                 </h3>
-                <p className="text-xs text-charcoal-600 leading-relaxed">
+                <p className="text-xs text-slate-600 leading-relaxed">
                   {kw.fullDef}
                 </p>
               </div>
@@ -290,35 +290,35 @@ export default function StudyMaterialView({
       {/* TAB 3: Glossary & Definitions */}
       {activeTab === 'definitions' && (
         <div className="space-y-4">
-          <div className="text-xs text-charcoal-500">
+          <div className="text-xs text-slate-500 font-medium">
             Exact terminology, phonetics, and contextual usage for rigorous academic recall:
           </div>
 
-          <div className="border border-[#E2E0D8] rounded-md bg-white divide-y divide-[#EFECE6] overflow-hidden">
+          <div className="border border-slate-200 rounded-2xl bg-white divide-y divide-slate-100 overflow-hidden shadow-card">
             {topic.definitions?.map((def, idx) => (
-              <div key={idx} className="p-4 space-y-2">
+              <div key={idx} className="p-5 space-y-2">
                 <div className="flex items-baseline gap-3 flex-wrap">
-                  <h3 className="font-serif text-lg font-semibold text-charcoal-900">
+                  <h3 className="text-base font-bold text-slate-900">
                     {def.term}
                   </h3>
                   {def.phonetic && (
-                    <span className="font-mono text-xs text-charcoal-500">
+                    <span className="font-mono text-xs text-slate-400 bg-slate-50 px-2 py-0.5 rounded">
                       {def.phonetic}
                     </span>
                   )}
                   {def.partOfSpeech && (
-                    <span className="text-xs text-charcoal-400 italic">
+                    <span className="text-xs text-slate-500 italic">
                       {def.partOfSpeech}
                     </span>
                   )}
                 </div>
 
-                <p className="text-sm text-charcoal-800 leading-relaxed">
+                <p className="text-sm text-slate-700 leading-relaxed">
                   {def.definition}
                 </p>
 
                 {def.example && (
-                  <div className="text-xs text-charcoal-600 bg-[#FAF9F5] border-l-2 border-[#D8D5CA] p-2 italic">
+                  <div className="text-xs text-slate-600 bg-slate-50 border-l-2 border-indigo-400 p-2.5 rounded-r italic">
                     Example: "{def.example}"
                   </div>
                 )}
@@ -332,12 +332,15 @@ export default function StudyMaterialView({
       {activeTab === 'quizPreview' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-charcoal-500">
+            <span className="text-xs text-slate-500 font-medium">
               Active recall deck consisting of {topic.quiz?.length || 0} multiple-choice conceptual questions.
             </span>
             <button
-              onClick={() => onStartQuiz(topic)}
-              className="px-3 py-1.5 rounded text-xs font-semibold text-white bg-[#312E81] hover:bg-[#282566] transition-colors flex items-center gap-1.5 shadow-xs"
+              onClick={() => {
+                onStartQuiz(topic);
+                navigate(`/quiz/${topic.id}`);
+              }}
+              className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-all flex items-center gap-1.5 shadow-xs"
             >
               <span>Launch Quiz Session</span>
               <ArrowRight size={13} />
@@ -348,22 +351,22 @@ export default function StudyMaterialView({
             {topic.quiz?.map((q, idx) => (
               <div 
                 key={q.id || idx}
-                className="p-4 bg-white border border-[#E2E0D8] rounded-md space-y-2.5"
+                className="p-5 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-subtle"
               >
-                <div className="flex items-center justify-between text-xs text-charcoal-500 font-mono">
+                <div className="flex items-center justify-between text-xs text-slate-500 font-mono">
                   <span>Question 0{idx + 1}</span>
                   <span>{q.options?.length} Options</span>
                 </div>
-                <h4 className="text-sm font-semibold text-charcoal-900 font-sans">
+                <h4 className="text-sm font-bold text-slate-900">
                   {q.question}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                   {q.options?.map((opt, optIdx) => (
                     <div 
                       key={optIdx} 
-                      className="text-xs text-charcoal-600 bg-[#FAF9F5] border border-[#E8E6DE] p-2 rounded flex items-start gap-2"
+                      className="text-xs text-slate-600 bg-slate-50 border border-slate-200/80 p-2.5 rounded-lg flex items-start gap-2"
                     >
-                      <span className="font-mono text-charcoal-400 font-medium">
+                      <span className="font-mono text-slate-400 font-bold">
                         {String.fromCharCode(65 + optIdx)}.
                       </span>
                       <span className="line-clamp-2">{opt}</span>
@@ -377,19 +380,22 @@ export default function StudyMaterialView({
       )}
 
       {/* Bottom Call to Action for Active Recall */}
-      <div className="pt-6 border-t border-[#E8E6DE]">
-        <div className="p-5 bg-[#FAF9F5] border border-[#E2E0D8] rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="pt-6 border-t border-slate-200">
+        <div className="p-6 bg-gradient-to-tr from-indigo-50 via-white to-blue-50 border border-indigo-100 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-card">
           <div className="space-y-1">
-            <div className="text-sm font-serif font-medium text-charcoal-900">
+            <div className="text-base font-bold text-slate-900">
               Ready to verify your retention of this material?
             </div>
-            <div className="text-xs text-charcoal-500">
+            <div className="text-xs text-slate-600">
               Take the {topic.quiz?.length || 4}-question recall quiz now to measure conceptual durability.
             </div>
           </div>
           <button
-            onClick={() => onStartQuiz(topic)}
-            className="px-4 py-2 rounded-md bg-[#312E81] hover:bg-[#282566] text-white text-xs font-semibold tracking-wide transition-colors flex items-center justify-center gap-2 self-start sm:self-auto shadow-xs"
+            onClick={() => {
+              onStartQuiz(topic);
+              navigate(`/quiz/${topic.id}`);
+            }}
+            className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold tracking-wide transition-all flex items-center justify-center gap-2 self-start sm:self-auto shadow-md shadow-indigo-600/20"
           >
             <span>Start Recall Quiz</span>
             <ArrowRight size={14} />
@@ -399,34 +405,34 @@ export default function StudyMaterialView({
 
       {/* Interactive Keyword Inspector Popover / Modal */}
       {activeKeywordModal && (
-        <div className="fixed inset-0 bg-charcoal-900/30 backdrop-blur-[1px] flex items-center justify-center z-50 p-4">
-          <div className="bg-white border border-[#E2E0D8] rounded-lg max-w-md w-full p-5 shadow-elevated space-y-3">
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono font-semibold uppercase px-2 py-0.5 rounded bg-[#EEF2FF] text-[#312E81]">
+              <span className="text-[11px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-indigo-50 text-indigo-700">
                 {activeKeywordModal.category || "Core Concept"}
               </span>
               <button
                 onClick={() => setActiveKeywordModal(null)}
-                className="text-charcoal-400 hover:text-charcoal-800 p-1 rounded"
+                className="text-slate-400 hover:text-slate-800 p-1 rounded-md"
               >
-                <X size={16} />
+                <X size={18} />
               </button>
             </div>
 
-            <h3 className="font-serif text-xl font-medium text-charcoal-900">
+            <h3 className="text-lg font-bold text-slate-900">
               {activeKeywordModal.term}
             </h3>
 
-            <p className="text-sm text-charcoal-700 leading-relaxed font-sans">
+            <p className="text-sm text-slate-700 leading-relaxed">
               {activeKeywordModal.fullDef || activeKeywordModal.shortDef}
             </p>
 
             <div className="pt-2 flex justify-end">
               <button
                 onClick={() => setActiveKeywordModal(null)}
-                className="px-3.5 py-1.5 rounded bg-[#F4F2EC] hover:bg-[#EAE7DC] text-charcoal-800 text-xs font-medium border border-[#E0DDCF] transition-colors"
+                className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors"
               >
-                Done
+                Got it
               </button>
             </div>
           </div>
