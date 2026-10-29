@@ -19,6 +19,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
   const [text, setText] = useState(initialText);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationStep, setGenerationStep] = useState('');
+  const [generationProgress, setGenerationProgress] = useState(0);
 
   // Generation options
   const [options, setOptions] = useState({
@@ -47,13 +48,16 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
     if (!text.trim()) return;
 
     setIsGenerating(true);
+    setGenerationProgress(25);
     setGenerationStep('Extracting core principles & hierarchical sections...');
 
     setTimeout(() => {
+      setGenerationProgress(65);
       setGenerationStep('Isolating domain invariants & terminology...');
     }, 600);
 
     setTimeout(() => {
+      setGenerationProgress(95);
       setGenerationStep('Formulating active recall questions & explanations...');
     }, 1200);
 
@@ -102,7 +106,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
               key={idx}
               type="button"
               onClick={() => handleLoadSample(sample)}
-              className="text-xs px-3 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#FBF4EE] text-[#252525] hover:text-[#C65D32] border border-[#E7E0D8] hover:border-[#ECD0C0] transition-colors font-semibold shadow-xs"
+              className="btn-tactile text-xs px-3 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#FBF4EE] text-[#252525] hover:text-[#C65D32] border border-[#E7E0D8] hover:border-[#ECD0C0] font-semibold shadow-xs"
             >
               Load: {sample.label}
             </button>
@@ -123,7 +127,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g., Cellular Respiration & Chemiosmosis"
-              className="w-full text-sm bg-white border border-[#E7E0D8] rounded-xl px-4 py-2.5 text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent font-sans shadow-xs"
+              className="input-glow w-full text-sm bg-white border border-[#E7E0D8] rounded-xl px-4 py-2.5 text-[#252525] focus:outline-none focus:bg-white font-sans shadow-xs"
             />
           </div>
 
@@ -134,7 +138,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
             <select
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="w-full text-sm bg-white border border-[#E7E0D8] rounded-xl px-3.5 py-2.5 text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] font-sans shadow-xs font-semibold"
+              className="input-glow w-full text-sm bg-white border border-[#E7E0D8] rounded-xl px-3.5 py-2.5 text-[#252525] focus:outline-none focus:bg-white font-sans shadow-xs font-semibold"
             >
               <option value="Machine Learning">Machine Learning</option>
               <option value="Cognitive Science">Cognitive Science</option>
@@ -164,7 +168,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Paste raw lecture excerpts, article text, or syllabus concepts here...&#10;&#10;Supports raw text, bullet points, and mathematical or scientific terminology."
-              className="w-full text-sm font-sans text-[#252525] placeholder:text-[#706B66]/60 bg-white border border-[#E7E0D8] rounded-2xl p-4 focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent leading-relaxed resize-y shadow-xs"
+              className="input-glow w-full text-sm font-sans text-[#252525] placeholder:text-[#706B66]/60 bg-white border border-[#E7E0D8] rounded-2xl p-4 focus:outline-none focus:bg-white leading-relaxed resize-y shadow-xs"
               required
             />
           </div>
@@ -174,7 +178,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
               <button
                 type="button"
                 onClick={() => setText('')}
-                className="text-xs text-[#706B66] hover:text-[#B93838] flex items-center gap-1 transition-colors pt-0.5 font-bold"
+                className="btn-tactile text-xs text-[#706B66] hover:text-[#B93838] flex items-center gap-1 pt-0.5 font-bold"
               >
                 <Trash2 size={12} />
                 <span>Clear text</span>
@@ -198,7 +202,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
             {/* Notes */}
             <div 
               onClick={() => toggleOption('notes')}
-              className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex items-start gap-3 ${
+              className={`card-interactive p-3.5 rounded-xl border text-left cursor-pointer flex items-start gap-3 ${
                 options.notes 
                   ? 'bg-[#FBF4EE] border-[#C65D32] ring-1 ring-[#C65D32]' 
                   : 'bg-[#FAF8F5] border-[#E7E0D8] opacity-60'
@@ -216,7 +220,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
             {/* Keywords */}
             <div 
               onClick={() => toggleOption('keywords')}
-              className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex items-start gap-3 ${
+              className={`card-interactive p-3.5 rounded-xl border text-left cursor-pointer flex items-start gap-3 ${
                 options.keywords 
                   ? 'bg-[#FBF4EE] border-[#C65D32] ring-1 ring-[#C65D32]' 
                   : 'bg-[#FAF8F5] border-[#E7E0D8] opacity-60'
@@ -234,7 +238,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
             {/* Definitions */}
             <div 
               onClick={() => toggleOption('definitions')}
-              className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex items-start gap-3 ${
+              className={`card-interactive p-3.5 rounded-xl border text-left cursor-pointer flex items-start gap-3 ${
                 options.definitions 
                   ? 'bg-[#FBF4EE] border-[#C65D32] ring-1 ring-[#C65D32]' 
                   : 'bg-[#FAF8F5] border-[#E7E0D8] opacity-60'
@@ -252,7 +256,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
             {/* Quiz */}
             <div 
               onClick={() => toggleOption('quiz')}
-              className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex items-start gap-3 ${
+              className={`card-interactive p-3.5 rounded-xl border text-left cursor-pointer flex items-start gap-3 ${
                 options.quiz 
                   ? 'bg-[#FBF4EE] border-[#C65D32] ring-1 ring-[#C65D32]' 
                   : 'bg-[#FAF8F5] border-[#E7E0D8] opacity-60'
@@ -285,14 +289,29 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
           </div>
         </div>
 
-        {/* Action Button & Progress */}
+        {/* Action Button & Enhanced Elegant Progress */}
         <div className="pt-2">
           {isGenerating ? (
-            <div className="p-5 bg-[#FBF4EE] border border-[#ECD0C0] rounded-2xl flex items-center gap-3.5 animate-fadeIn">
-              <Loader2 size={20} className="animate-spin text-[#C65D32] shrink-0" />
-              <div className="space-y-0.5">
-                <div className="text-xs font-bold text-[#983E1A]">Synthesizing Learning Material...</div>
-                <div className="text-xs text-[#C65D32] font-mono">{generationStep}</div>
+            <div className="p-5 bg-[#FBF4EE] border border-[#ECD0C0] rounded-2xl space-y-3 animate-fadeIn shadow-subtle">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Loader2 size={18} className="animate-spin text-[#C65D32] shrink-0" />
+                  <div className="text-xs font-bold text-[#983E1A]">Synthesizing Learning Material...</div>
+                </div>
+                <span className="text-xs font-mono font-bold text-[#C65D32]">{generationProgress}%</span>
+              </div>
+              
+              {/* Animated Progress Bar */}
+              <div className="w-full bg-[#ECD0C0]/50 h-2 rounded-full overflow-hidden">
+                <div 
+                  className="progress-bar-smooth bg-[#C65D32] h-full rounded-full"
+                  style={{ width: `${generationProgress}%` }}
+                />
+              </div>
+
+              <div className="text-xs text-[#706B66] font-mono pt-0.5 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#C65D32] animate-ping" />
+                <span>{generationStep}</span>
               </div>
             </div>
           ) : (
@@ -303,7 +322,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
               <button
                 type="submit"
                 disabled={!text.trim()}
-                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide shadow-xs transition-colors flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="btn-tactile w-full sm:w-auto px-6 py-3 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide shadow-xs flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <span>Generate Study Material</span>
                 <ArrowRight size={14} />

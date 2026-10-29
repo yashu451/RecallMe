@@ -58,7 +58,7 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-6 bg-[#F7F3ED]">
-      <div className="w-full max-w-md bg-white rounded-2xl border border-[#E7E0D8] shadow-card p-6 sm:p-8 space-y-6">
+      <div className="w-full max-w-md bg-white rounded-2xl border border-[#E7E0D8] shadow-card p-6 sm:p-8 space-y-6 card-interactive">
         
         {/* Header */}
         <div className="text-center space-y-1.5">
@@ -92,7 +92,7 @@ export default function SignupPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g., Alex Chen"
-                className="w-full pl-9 pr-3.5 py-2 text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent transition-all"
+                className="w-full pl-9 pr-3.5 py-2 text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent transition-all input-glow"
                 required
               />
             </div>
@@ -107,7 +107,7 @@ export default function SignupPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="student@stanford.edu"
-                className="w-full pl-9 pr-3.5 py-2 text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent transition-all"
+                className="w-full pl-9 pr-3.5 py-2 text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent transition-all input-glow"
                 required
               />
             </div>
@@ -122,7 +122,7 @@ export default function SignupPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 6 characters"
-                className="w-full pl-9 pr-10 py-2 text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent transition-all"
+                className="w-full pl-9 pr-10 py-2 text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent transition-all input-glow"
                 required
               />
               <button
@@ -160,7 +160,7 @@ export default function SignupPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Re-enter password"
-                className="w-full pl-9 pr-3.5 py-2 text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent transition-all"
+                className="w-full pl-9 pr-3.5 py-2 text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent transition-all input-glow"
                 required
               />
             </div>
@@ -168,7 +168,7 @@ export default function SignupPage() {
 
           <button
             type="submit"
-            className="w-full py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white font-bold text-xs shadow-xs transition-colors flex items-center justify-center gap-2"
+            className="w-full py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white font-bold text-xs shadow-xs transition-colors flex items-center justify-center gap-2 btn-tactile"
           >
             <span>Create Free Account</span>
             <ArrowRight size={14} />

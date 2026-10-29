@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import TiltCard from '../common/TiltCard';
 import { 
   ArrowRight, 
   Sparkles, 
@@ -51,7 +52,7 @@ export default function LandingPage() {
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
           <Link
             to="/signup"
-            className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white font-bold text-sm shadow-card transition-all flex items-center justify-center gap-2 group"
+            className="btn-tactile w-full sm:w-auto px-7 py-3.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white font-bold text-sm shadow-card flex items-center justify-center gap-2 group"
           >
             <span>Get Started Free</span>
             <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
@@ -59,7 +60,7 @@ export default function LandingPage() {
 
           <Link
             to="/dashboard"
-            className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-white hover:bg-[#FAF8F5] text-[#222222] font-bold text-sm border border-[#E7E0D8] shadow-xs transition-colors flex items-center justify-center gap-2"
+            className="btn-tactile w-full sm:w-auto px-7 py-3.5 rounded-xl bg-white hover:bg-[#FAF8F5] text-[#222222] font-bold text-sm border border-[#E7E0D8] shadow-xs flex items-center justify-center gap-2"
           >
             <span>Explore Live Demo</span>
             <ChevronRight size={16} className="text-[#706B66]" />
@@ -82,9 +83,14 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* 2. INTERACTIVE PRODUCT PREVIEW */}
+        {/* 2. INTERACTIVE PRODUCT PREVIEW WITH 3D DEPTH */}
         <div className="mt-14 relative max-w-5xl mx-auto">
-          <div className="rounded-2xl border border-[#E7E0D8] bg-white shadow-card overflow-hidden text-left">
+          <TiltCard 
+            maxTilt={3} 
+            scale={1.008} 
+            glare={true}
+            className="rounded-2xl border border-[#E7E0D8] bg-white shadow-card text-left card-interactive"
+          >
             
             {/* Window title bar */}
             <div className="px-4 py-3 bg-[#FAF8F5] border-b border-[#E7E0D8] flex items-center justify-between">
@@ -247,7 +253,7 @@ export default function LandingPage() {
               )}
             </div>
 
-          </div>
+          </TiltCard>
         </div>
 
       </section>
@@ -270,8 +276,8 @@ export default function LandingPage() {
 
           <div className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             {/* Step 1 */}
-            <div className="bg-[#FAF8F5] p-7 rounded-2xl border border-[#E7E0D8] space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-[#222222] text-[#F7F3ED] flex items-center justify-center font-bold text-lg">
+            <div className="card-interactive bg-[#FAF8F5] p-7 rounded-2xl border border-[#E7E0D8] space-y-4">
+              <div className="w-12 h-12 rounded-xl bg-[#222222] text-[#F7F3ED] flex items-center justify-center font-bold text-lg shadow-xs">
                 01
               </div>
               <h4 className="text-lg font-bold text-[#222222]">Paste Your Raw Material</h4>
@@ -281,8 +287,8 @@ export default function LandingPage() {
             </div>
 
             {/* Step 2 */}
-            <div className="bg-[#FAF8F5] p-7 rounded-2xl border border-[#E7E0D8] space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-[#C65D32] text-white flex items-center justify-center font-bold text-lg">
+            <div className="card-interactive bg-[#FAF8F5] p-7 rounded-2xl border border-[#E7E0D8] space-y-4">
+              <div className="w-12 h-12 rounded-xl bg-[#C65D32] text-white flex items-center justify-center font-bold text-lg shadow-xs">
                 02
               </div>
               <h4 className="text-lg font-bold text-[#222222]">Automated Semantic Synthesis</h4>
@@ -292,8 +298,8 @@ export default function LandingPage() {
             </div>
 
             {/* Step 3 */}
-            <div className="bg-[#FAF8F5] p-7 rounded-2xl border border-[#E7E0D8] space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-[#222222] text-[#E8B786] flex items-center justify-center font-bold text-lg">
+            <div className="card-interactive bg-[#FAF8F5] p-7 rounded-2xl border border-[#E7E0D8] space-y-4">
+              <div className="w-12 h-12 rounded-xl bg-[#222222] text-[#E8B786] flex items-center justify-center font-bold text-lg shadow-xs">
                 03
               </div>
               <h4 className="text-lg font-bold text-[#222222]">Lock in Retention with Quizzes</h4>
@@ -323,7 +329,7 @@ export default function LandingPage() {
 
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           
-          <div className="p-6 rounded-2xl border border-[#E7E0D8] bg-white shadow-xs hover:border-[#C65D32] transition-colors space-y-3">
+          <div className="card-interactive p-6 rounded-2xl border border-[#E7E0D8] bg-white shadow-xs hover:border-[#C65D32] transition-colors space-y-3">
             <div className="w-10 h-10 rounded-xl bg-[#FBF4EE] text-[#C65D32] flex items-center justify-center">
               <BookOpen size={20} />
             </div>
@@ -333,7 +339,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl border border-[#E7E0D8] bg-white shadow-xs hover:border-[#C65D32] transition-colors space-y-3">
+          <div className="card-interactive p-6 rounded-2xl border border-[#E7E0D8] bg-white shadow-xs hover:border-[#C65D32] transition-colors space-y-3">
             <div className="w-10 h-10 rounded-xl bg-[#FBF4EE] text-[#C65D32] flex items-center justify-center">
               <Zap size={20} />
             </div>
@@ -343,7 +349,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl border border-[#E7E0D8] bg-white shadow-xs hover:border-[#C65D32] transition-colors space-y-3">
+          <div className="card-interactive p-6 rounded-2xl border border-[#E7E0D8] bg-white shadow-xs hover:border-[#C65D32] transition-colors space-y-3">
             <div className="w-10 h-10 rounded-xl bg-[#FAF5EF] text-[#7A3216] border border-[#E8B786] flex items-center justify-center">
               <Flame size={20} className="text-[#C65D32]" />
             </div>
@@ -353,7 +359,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl border border-[#E7E0D8] bg-white shadow-xs hover:border-[#C65D32] transition-colors space-y-3">
+          <div className="card-interactive p-6 rounded-2xl border border-[#E7E0D8] bg-white shadow-xs hover:border-[#C65D32] transition-colors space-y-3">
             <div className="w-10 h-10 rounded-xl bg-[#FBF4EE] text-[#C65D32] flex items-center justify-center">
               <Layers size={20} />
             </div>
@@ -480,13 +486,13 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
             <Link
               to="/signup"
-              className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white font-bold text-sm shadow-card transition-all"
+              className="btn-tactile w-full sm:w-auto px-7 py-3.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white font-bold text-sm shadow-card"
             >
               Get Started Free
             </Link>
             <Link
               to="/login"
-              className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-transparent hover:bg-white/10 text-white font-bold text-sm border border-white/20 transition-all"
+              className="btn-tactile w-full sm:w-auto px-7 py-3.5 rounded-xl bg-transparent hover:bg-white/10 text-white font-bold text-sm border border-white/20"
             >
               Log In to Account
             </Link>

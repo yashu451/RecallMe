@@ -44,7 +44,7 @@ export default function QuizHistoryView({
 
       {/* Aggregate Overview Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-5 bg-white border border-[#E7E0D8] rounded-2xl shadow-subtle space-y-1">
+        <div className="p-5 bg-white border border-[#E7E0D8] rounded-2xl shadow-subtle space-y-1 card-interactive">
           <div className="text-[11px] font-bold uppercase tracking-wider text-[#706B66]">
             Total Sessions
           </div>
@@ -54,7 +54,7 @@ export default function QuizHistoryView({
           <div className="text-xs text-[#706B66]">Across all enrolled domains</div>
         </div>
 
-        <div className="p-5 bg-white border border-[#E7E0D8] rounded-2xl shadow-subtle space-y-1">
+        <div className="p-5 bg-white border border-[#E7E0D8] rounded-2xl shadow-subtle space-y-1 card-interactive">
           <div className="text-[11px] font-bold uppercase tracking-wider text-[#706B66]">
             Average Retention
           </div>
@@ -64,7 +64,7 @@ export default function QuizHistoryView({
           <div className="text-xs text-[#38765C] font-bold">Target &gt; 80% achieved</div>
         </div>
 
-        <div className="p-5 bg-white border border-[#E7E0D8] rounded-2xl shadow-subtle space-y-1">
+        <div className="p-5 bg-white border border-[#E7E0D8] rounded-2xl shadow-subtle space-y-1 card-interactive">
           <div className="text-[11px] font-bold uppercase tracking-wider text-[#706B66]">
             Active Recall Protocol
           </div>
@@ -83,7 +83,7 @@ export default function QuizHistoryView({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Filter history by topic or subject..."
-          className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent shadow-xs"
+          className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent shadow-xs input-glow"
         />
       </div>
 
@@ -98,7 +98,7 @@ export default function QuizHistoryView({
             {filteredHistory.map((item) => (
               <div 
                 key={item.id}
-                className="p-5 hover:bg-[#FAF8F5] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                className="p-5 hover:bg-[#FAF8F5] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 card-interactive"
               >
                 <div className="space-y-1 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -144,7 +144,7 @@ export default function QuizHistoryView({
                         if (onReviewTopic) onReviewTopic(item.topicId);
                         navigate(`/study/${item.topicId}`);
                       }}
-                      className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#252525] hover:text-[#222222] bg-[#F7F3ED] hover:bg-[#EFE9DF] border border-[#E7E0D8] transition-colors"
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#252525] hover:text-[#222222] bg-[#F7F3ED] hover:bg-[#EFE9DF] border border-[#E7E0D8] transition-colors btn-tactile"
                     >
                       Notes
                     </button>
@@ -153,7 +153,7 @@ export default function QuizHistoryView({
                         if (onRetakeTopic) onRetakeTopic(item.topicId);
                         navigate(`/quiz/${item.topicId}`);
                       }}
-                      className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] transition-colors flex items-center gap-1 shadow-xs"
+                      className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] transition-colors flex items-center gap-1 shadow-xs btn-tactile"
                     >
                       <RotateCcw size={12} />
                       <span>Retake</span>

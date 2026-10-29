@@ -50,7 +50,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-6 bg-[#F7F3ED]">
-      <div className="w-full max-w-md bg-white rounded-2xl border border-[#E7E0D8] shadow-card p-6 sm:p-8 space-y-6">
+      <div className="w-full max-w-md bg-white rounded-2xl border border-[#E7E0D8] shadow-card p-6 sm:p-8 space-y-6 card-interactive">
         
         {/* Header */}
         <div className="text-center space-y-1.5">
@@ -69,7 +69,7 @@ export default function LoginPage() {
         <button
           type="button"
           onClick={handleDemoLogin}
-          className="w-full py-2.5 px-3 bg-[#FBF4EE] hover:bg-[#F6E7DE] border border-[#ECD0C0] rounded-xl text-xs font-bold text-[#983E1A] flex items-center justify-center gap-2 transition-colors shadow-xs"
+          className="w-full py-2.5 px-3 bg-[#FBF4EE] hover:bg-[#F6E7DE] border border-[#ECD0C0] rounded-xl text-xs font-bold text-[#983E1A] flex items-center justify-center gap-2 transition-colors shadow-xs btn-tactile"
         >
           <Sparkles size={14} className="text-[#C65D32]" />
           <span>One-Click Demo Account Login (Alex Chen)</span>
@@ -101,7 +101,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="e.g., student@university.edu"
-                className="w-full pl-9 pr-3.5 py-2 text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent transition-all"
+                className="w-full pl-9 pr-3.5 py-2 text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent transition-all input-glow"
                 required
               />
             </div>
@@ -125,7 +125,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-9 pr-10 py-2 text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent transition-all"
+                className="w-full pl-9 pr-10 py-2 text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent transition-all input-glow"
                 required
               />
               <button
@@ -141,7 +141,7 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white font-bold text-xs shadow-xs transition-colors flex items-center justify-center gap-2"
+            className="w-full py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white font-bold text-xs shadow-xs transition-colors flex items-center justify-center gap-2 btn-tactile"
           >
             <span>Log In to Dashboard</span>
             <ArrowRight size={14} />
@@ -178,20 +178,20 @@ export default function LoginPage() {
                   type="email"
                   defaultValue={email}
                   placeholder="student@university.edu"
-                  className="w-full px-3 py-2 text-xs bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32]"
+                  className="w-full px-3 py-2 text-xs bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] input-glow"
                   required
                 />
                 <div className="flex justify-end gap-2 pt-1">
                   <button
                     type="button"
                     onClick={() => setForgotModal(false)}
-                    className="px-3 py-1.5 text-xs text-[#706B66] hover:bg-[#F7F3ED] rounded-lg font-medium"
+                    className="px-3 py-1.5 text-xs text-[#706B66] hover:bg-[#F7F3ED] rounded-lg font-medium btn-tactile"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-3.5 py-1.5 text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] rounded-lg shadow-xs"
+                    className="px-3.5 py-1.5 text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] rounded-lg shadow-xs btn-tactile"
                   >
                     Send Reset Link
                   </button>

@@ -70,7 +70,7 @@ export default function SettingsModal({ isOpen, onClose }) {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent"
+              className="w-full px-3 py-2 text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent input-glow"
               required
             />
           </div>
@@ -81,7 +81,7 @@ export default function SettingsModal({ isOpen, onClose }) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent"
+              className="w-full px-3 py-2 text-sm bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:border-transparent input-glow"
               required
             />
           </div>
@@ -92,7 +92,7 @@ export default function SettingsModal({ isOpen, onClose }) {
               <select
                 value={dailyGoal}
                 onChange={(e) => setDailyGoal(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32]"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] input-glow"
               >
                 <option value={3}>3 Concepts / day</option>
                 <option value={5}>5 Concepts / day</option>
@@ -105,7 +105,7 @@ export default function SettingsModal({ isOpen, onClose }) {
               <select
                 value={spacedInterval}
                 onChange={(e) => setSpacedInterval(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32]"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#E7E0D8] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#C65D32] input-glow"
               >
                 <option value="24h">Daily (24 hours)</option>
                 <option value="48h">Optimal (48 hours)</option>
@@ -132,13 +132,13 @@ export default function SettingsModal({ isOpen, onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-3.5 py-2 text-xs font-bold text-[#706B66] hover:text-[#222222] hover:bg-[#F7F3ED] rounded-xl transition-colors"
+              className="px-3.5 py-2 text-xs font-bold text-[#706B66] hover:text-[#222222] hover:bg-[#F7F3ED] rounded-xl transition-colors btn-tactile"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] rounded-xl shadow-xs transition-colors"
+              className="px-4 py-2 text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] rounded-xl shadow-xs transition-colors btn-tactile"
             >
               Save Changes
             </button>

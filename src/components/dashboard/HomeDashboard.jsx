@@ -67,9 +67,9 @@ export default function HomeDashboard({
           </p>
         </div>
 
-        {/* Sand & Burnt Orange Streak Badge */}
-        <div className="p-3.5 bg-[#FAF5EF] border border-[#E8B786] rounded-2xl flex items-center gap-3.5 shadow-xs shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-[#222222] text-[#E8B786] flex items-center justify-center">
+        {/* Sand & Burnt Orange Streak Badge with tactile hover */}
+        <div className="card-interactive p-3.5 bg-[#FAF5EF] border border-[#E8B786] rounded-2xl flex items-center gap-3.5 shadow-xs shrink-0 cursor-pointer">
+          <div className="w-10 h-10 rounded-xl bg-[#222222] text-[#E8B786] flex items-center justify-center shadow-xs">
             <Flame size={22} className="text-[#C65D32] fill-[#C65D32]" />
           </div>
           <div>
@@ -84,7 +84,7 @@ export default function HomeDashboard({
       </header>
 
       {/* 2. "What did you learn today?" Rapid Input */}
-      <section className="bg-white border border-[#E7E0D8] rounded-2xl p-5 sm:p-7 shadow-card space-y-4">
+      <section className="card-interactive bg-white border border-[#E7E0D8] rounded-2xl p-5 sm:p-7 shadow-card space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <h2 className="text-sm font-bold text-[#222222] tracking-tight flex items-center gap-2">
@@ -107,7 +107,7 @@ export default function HomeDashboard({
               value={quickInput}
               onChange={(e) => setQuickInput(e.target.value)}
               placeholder="e.g., 'Today we covered how the Taylor Rule specifies that central banks raise nominal rates more than 1:1 when inflation rises...' or paste paper excerpts"
-              className="w-full text-sm text-[#252525] placeholder:text-[#706B66]/60 bg-[#FAF8F5] border border-[#E7E0D8] rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:bg-white transition-all leading-relaxed resize-y font-sans"
+              className="input-glow w-full text-sm text-[#252525] placeholder:text-[#706B66]/60 bg-[#FAF8F5] border border-[#E7E0D8] rounded-xl p-4 focus:outline-none focus:bg-white leading-relaxed resize-y font-sans shadow-xs"
             />
           </div>
 
@@ -120,18 +120,18 @@ export default function HomeDashboard({
                   type="button"
                   key={idx}
                   onClick={() => setQuickInput(p.text)}
-                  className="text-xs px-2.5 py-1 rounded-lg bg-[#F7F3ED] hover:bg-[#EFE9DF] text-[#252525] transition-colors font-semibold border border-[#E7E0D8]"
+                  className="btn-tactile text-xs px-2.5 py-1 rounded-lg bg-[#F7F3ED] hover:bg-[#EFE9DF] text-[#252525] font-semibold border border-[#E7E0D8]"
                 >
                   {p.label}
                 </button>
               ))}
             </div>
 
-            {/* Primary Action Button */}
+            {/* Primary Action Button with tactile feedback */}
             <button
               type="submit"
               disabled={!quickInput.trim()}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide shadow-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="btn-tactile w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide shadow-xs disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <span>Create study notes</span>
               <ArrowRight size={14} />
@@ -154,7 +154,7 @@ export default function HomeDashboard({
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
           {/* Stat 1 */}
-          <div className="p-4 bg-white border border-[#E7E0D8] rounded-xl shadow-subtle space-y-2">
+          <div className="card-interactive p-4 bg-white border border-[#E7E0D8] rounded-xl shadow-subtle space-y-2">
             <div className="text-[11px] font-bold text-[#706B66] uppercase tracking-wider">
               Mean Retention Score
             </div>
@@ -163,12 +163,12 @@ export default function HomeDashboard({
               <span className="text-xs text-[#38765C] font-bold">↑ 3.2% vs last week</span>
             </div>
             <div className="w-full bg-[#FAF8F5] border border-[#E7E0D8] h-2 rounded-full overflow-hidden">
-              <div className="bg-[#C65D32] h-full rounded-full" style={{ width: '88%' }}></div>
+              <div className="progress-bar-smooth bg-[#C65D32] h-full rounded-full" style={{ width: '88%' }}></div>
             </div>
           </div>
 
           {/* Stat 2 */}
-          <div className="p-4 bg-white border border-[#E7E0D8] rounded-xl shadow-subtle space-y-2">
+          <div className="card-interactive p-4 bg-white border border-[#E7E0D8] rounded-xl shadow-subtle space-y-2">
             <div className="text-[11px] font-bold text-[#706B66] uppercase tracking-wider">
               Active Concepts Mastered
             </div>
@@ -182,7 +182,7 @@ export default function HomeDashboard({
           </div>
 
           {/* Stat 3: 7-Day Recall Rhythm */}
-          <div className="p-4 bg-white border border-[#E7E0D8] rounded-xl shadow-subtle space-y-2">
+          <div className="card-interactive p-4 bg-white border border-[#E7E0D8] rounded-xl shadow-subtle space-y-2">
             <div className="text-[11px] font-bold text-[#706B66] uppercase tracking-wider">
               7-Day Recall Rhythm
             </div>
@@ -198,7 +198,7 @@ export default function HomeDashboard({
               ].map((item, i) => (
                 <div key={i} className="flex flex-col items-center gap-1">
                   <div
-                    className={`w-6 h-6 rounded-lg flex items-center justify-center text-[11px] font-bold ${
+                    className={`w-6 h-6 rounded-lg flex items-center justify-center text-[11px] font-bold transition-transform hover:scale-110 ${
                       item.today
                         ? 'bg-[#C65D32] text-white shadow-xs'
                         : item.active
@@ -233,7 +233,7 @@ export default function HomeDashboard({
             className="text-xs text-[#C65D32] hover:text-[#983E1A] font-bold flex items-center gap-1 group"
           >
             <span>View all in Library</span>
-            <ChevronRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+            <ChevronRight size={13} className="transition-transform group-hover:translate-x-1" />
           </button>
         </div>
 
@@ -242,7 +242,7 @@ export default function HomeDashboard({
           {topics.slice(0, 4).map((topic) => (
             <div 
               key={topic.id}
-              className="p-5 hover:bg-[#FAF8F5] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
+              className="p-5 hover:bg-[#FAF8F5] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
             >
               {/* Left Column: Title & Subject */}
               <div className="space-y-1 sm:max-w-md">
@@ -284,7 +284,7 @@ export default function HomeDashboard({
                   <div className="flex items-center gap-2 mt-0.5">
                     <div className="w-16 bg-[#FAF8F5] border border-[#E7E0D8] h-2 rounded-full overflow-hidden">
                       <div 
-                        className="bg-[#C65D32] h-full rounded-full" 
+                        className="progress-bar-smooth bg-[#C65D32] h-full rounded-full" 
                         style={{ width: `${topic.masteryScore}%` }}
                       ></div>
                     </div>
@@ -301,7 +301,7 @@ export default function HomeDashboard({
                       onSelectTopic(topic);
                       navigate(`/study/${topic.id}`);
                     }}
-                    className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#252525] hover:text-[#222222] bg-[#F7F3ED] hover:bg-[#EFE9DF] border border-[#E7E0D8] transition-colors"
+                    className="btn-tactile px-3 py-1.5 rounded-lg text-xs font-bold text-[#252525] hover:text-[#222222] bg-[#F7F3ED] hover:bg-[#EFE9DF] border border-[#E7E0D8]"
                   >
                     Notes
                   </button>
@@ -310,7 +310,7 @@ export default function HomeDashboard({
                       onStartQuiz(topic);
                       navigate(`/quiz/${topic.id}`);
                     }}
-                    className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] transition-colors flex items-center gap-1 shadow-xs"
+                    className="btn-tactile px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] flex items-center gap-1 shadow-xs"
                   >
                     <span>Quiz</span>
                     <ArrowRight size={12} />
