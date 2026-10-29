@@ -14,11 +14,16 @@ import {
   Clock, 
   Layers, 
   Info, 
-  X 
+  X,
+  BookmarkPlus,
+  Loader2
 } from 'lucide-react';
 
 export default function StudyMaterialView({ 
   topic, 
+  isLoading = false,
+  isSaved = true,
+  onSaveToLibrary,
   onBack, 
   onStartQuiz, 
   onToggleStar 
@@ -27,8 +32,68 @@ export default function StudyMaterialView({
   const [activeTab, setActiveTab] = useState('notes'); // 'notes' | 'keywords' | 'definitions' | 'quizPreview'
   const [copied, setCopied] = useState(false);
   const [activeKeywordModal, setActiveKeywordModal] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [savedLocal, setSavedLocal] = useState(isSaved);
+  const [saveToast, setSaveToast] = useState(false);
 
-  if (!topic) return null;
+  // If loading skeleton
+  if (isLoading) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 animate-pulse">
+        <div className="h-4 bg-[#E7E0D8] rounded w-24" />
+        <div className="h-9 bg-[#E7E0D8] rounded w-2/3" />
+        <div className="h-4 bg-[#E7E0D8] rounded w-full" />
+        <div className="h-32 bg-white border border-[#E7E0D8] rounded-2xl p-6" />
+        <div className="h-48 bg-white border border-[#E7E0D8] rounded-2xl p-6" />
+      </div>
+    );
+  }
+
+  // If no topic found
+  if (!topic) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center space-y-4 animate-fadeIn">
+        <div className="w-14 h-14 rounded-full bg-[#FAF5EF] text-[#C65D32] border border-[#E8B786] flex items-center justify-center mx-auto">
+          <BookOpen size={24} />
+        </div>
+        <h2 className="text-xl font-bold text-[#222222]">Study Material Not Found</h2>
+        <p className="text-sm text-[#706B66] max-w-sm mx-auto">
+          The requested study notes could not be found or have not been saved yet.
+        </p>
+        <div className="pt-2 flex items-center justify-center gap-3">
+          <button
+            onClick={onBack || (() => navigate('/library'))}
+            className="btn-tactile px-4 py-2 rounded-xl text-xs font-bold text-[#252525] bg-white hover:bg-[#FAF8F5] border border-[#E7E0D8]"
+          >
+            Go to Library
+          </button>
+          <button
+            onClick={() => navigate('/create')}
+            className="btn-tactile px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24]"
+          >
+            Create New Notes
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const handleSave = async () => {
+    if (saving || savedLocal) return;
+    setSaving(true);
+    try {
+      if (typeof onSaveToLibrary === 'function') {
+        await onSaveToLibrary(topic);
+      }
+      setSavedLocal(true);
+      setSaveToast(true);
+      setTimeout(() => setSaveToast(false), 3500);
+    } catch (err) {
+      console.error('Failed to save topic to library:', err);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleCopyMarkdown = () => {
     let md = `# ${topic.title}\n\n`;
@@ -62,8 +127,21 @@ export default function StudyMaterialView({
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
       
+      {/* Toast Notification when Saved */}
+      {saveToast && (
+        <div className="fixed bottom-6 right-6 z-50 p-4 bg-[#222222] text-[#F7F3ED] rounded-2xl shadow-xl flex items-center gap-3 border border-[#E8B786] animate-in fade-in slide-in-from-bottom duration-200">
+          <div className="w-8 h-8 rounded-full bg-[#38765C] text-white flex items-center justify-center shrink-0">
+            <Check size={16} />
+          </div>
+          <div className="space-y-0.5">
+            <div className="text-xs font-bold">Saved to My Library!</div>
+            <div className="text-[11px] text-[#E8B786]">You can access this note anytime in your library.</div>
+          </div>
+        </div>
+      )}
+
       {/* Top Navigation Bar */}
-      <div className="flex items-center justify-between border-b border-[#E7E0D8] pb-4">
+      <div className="flex items-center justify-between border-b border-[#E7E0D8] pb-4 flex-wrap gap-3">
         <button
           onClick={onBack || (() => navigate('/library'))}
           className="text-xs font-bold text-[#706B66] hover:text-[#222222] flex items-center gap-1.5 transition-colors btn-tactile"
@@ -72,19 +150,38 @@ export default function StudyMaterialView({
           <span>Back to Library</span>
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Save to My Library Button */}
+          {!savedLocal ? (
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] transition-colors flex items-center gap-1.5 shadow-xs btn-tactile disabled:opacity-50"
+            >
+              {saving ? <Loader2 size={14} className="animate-spin" /> : <BookmarkPlus size={14} />}
+              <span>{saving ? 'Saving...' : 'Save to My Library'}</span>
+            </button>
+          ) : (
+            <div className="px-3 py-1.5 rounded-xl text-xs font-bold text-[#38765C] bg-[#EDF5F1] border border-[#C0DCD0] flex items-center gap-1.5">
+              <CheckCircle2 size={14} />
+              <span>Saved in Library</span>
+            </div>
+          )}
+
           {/* Star Bookmark */}
-          <button
-            onClick={() => onToggleStar(topic.id)}
-            className={`p-2 rounded-xl border transition-all btn-tactile ${
-              topic.isStarred
-                ? 'bg-[#FAF5EF] text-[#C65D32] border-[#E8B786]'
-                : 'text-[#706B66] hover:text-[#222222] bg-white border-[#E7E0D8]'
-            }`}
-            title={topic.isStarred ? 'Saved to favorites' : 'Star this topic'}
-          >
-            <Star size={15} className={topic.isStarred ? 'fill-[#C65D32] text-[#C65D32]' : ''} />
-          </button>
+          {onToggleStar && (
+            <button
+              onClick={() => onToggleStar(topic.id)}
+              className={`p-2 rounded-xl border transition-all btn-tactile ${
+                topic.isStarred
+                  ? 'bg-[#FAF5EF] text-[#C65D32] border-[#E8B786]'
+                  : 'text-[#706B66] hover:text-[#222222] bg-white border-[#E7E0D8]'
+              }`}
+              title={topic.isStarred ? 'Saved to favorites' : 'Star this topic'}
+            >
+              <Star size={15} className={topic.isStarred ? 'fill-[#C65D32] text-[#C65D32]' : ''} />
+            </button>
+          )}
 
           {/* Copy Markdown */}
           <button
@@ -98,22 +195,49 @@ export default function StudyMaterialView({
           {/* Start Recall Quiz */}
           <button
             onClick={() => {
-              onStartQuiz(topic);
+              if (onStartQuiz) onStartQuiz(topic);
               navigate(`/quiz/${topic.id}`);
             }}
-            className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] transition-colors flex items-center gap-1.5 shadow-xs btn-tactile"
+            className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#222222] bg-[#FAF5EF] hover:bg-[#FBF4EE] border border-[#E8B786] transition-colors flex items-center gap-1.5 shadow-xs btn-tactile"
           >
-            <span>Take Recall Quiz</span>
-            <ArrowRight size={13} />
+            <span>Practice Quiz</span>
+            <ArrowRight size={13} className="text-[#C65D32]" />
           </button>
         </div>
       </div>
+
+      {/* Prominent Save Banner if freshly generated and unsaved */}
+      {!savedLocal && (
+        <div className="p-4 sm:p-5 bg-gradient-to-r from-[#FAF5EF] via-[#FFFDFB] to-[#FBF4EE] border border-[#E8B786] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-card">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#222222] text-[#E8B786] flex items-center justify-center shrink-0">
+              <Sparkles size={20} className="text-[#C65D32]" />
+            </div>
+            <div className="space-y-0.5">
+              <div className="text-sm font-bold text-[#222222]">Generated Study Notes Ready</div>
+              <p className="text-xs text-[#706B66]">
+                Review your synthesized study material below. Click save to store it in My Library.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving}
+            className="btn-tactile shrink-0 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] transition-colors flex items-center justify-center gap-2 shadow-xs disabled:opacity-50"
+          >
+            {saving ? <Loader2 size={14} className="animate-spin" /> : <BookmarkPlus size={15} />}
+            <span>{saving ? 'Saving...' : 'Save to My Library'}</span>
+          </button>
+        </div>
+      )}
 
       {/* Article Header & Metadata */}
       <header className="space-y-3">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-[#FBF4EE] text-[#C65D32] border border-[#ECD0C0]">
-            {topic.subject}
+            {topic.subject || 'General'}
           </span>
           {topic.subjectCode && (
             <span className="text-xs font-mono text-[#706B66] bg-white border border-[#E7E0D8] px-2 py-0.5 rounded">
@@ -123,12 +247,16 @@ export default function StudyMaterialView({
           <span className="text-[#E7E0D8]">•</span>
           <span className="text-xs text-[#706B66] flex items-center gap-1 font-medium">
             <Clock size={13} />
-            {topic.readTime}
+            {topic.readTime || '4 min read'}
           </span>
-          <span className="text-[#E7E0D8]">•</span>
-          <span className="text-xs text-[#706B66]">
-            Last studied {topic.lastStudied}
-          </span>
+          {topic.lastStudied && (
+            <>
+              <span className="text-[#E7E0D8]">•</span>
+              <span className="text-xs text-[#706B66]">
+                {topic.lastStudied}
+              </span>
+            </>
+          )}
         </div>
 
         <h1 className="text-2xl sm:text-4xl font-extrabold text-[#222222] tracking-tight leading-tight">
@@ -154,222 +282,155 @@ export default function StudyMaterialView({
         )}
       </header>
 
-      {/* Tabs */}
-      <div className="border-b border-[#E7E0D8] flex items-center gap-6 text-sm">
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`pb-3 font-bold transition-all relative text-xs sm:text-sm ${
-                isActive
-                  ? 'text-[#C65D32]'
-                  : 'text-[#706B66] hover:text-[#222222]'
-              }`}
-            >
-              <span>{tab.label}</span>
-              {isActive && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C65D32] rounded-full"></span>
-              )}
-            </button>
-          );
-        })}
+      {/* Key Takeaways Callout Box */}
+      {topic.takeaways && topic.takeaways.length > 0 && (
+        <section className="bg-white border border-[#E7E0D8] rounded-2xl p-6 shadow-card space-y-3">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#C65D32]">
+            <Sparkles size={14} />
+            <span>Key Invariants & Takeaways</span>
+          </div>
+          <ul className="space-y-2.5">
+            {topic.takeaways.map((takeaway, i) => (
+              <li key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#252525] leading-relaxed">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#C65D32] mt-2 shrink-0"></span>
+                <span>{takeaway}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Section Navigation Tabs */}
+      <div className="border-b border-[#E7E0D8] flex items-center gap-2 overflow-x-auto pb-px">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`pb-3 px-3 text-xs sm:text-sm font-bold transition-all border-b-2 whitespace-nowrap ${
+              activeTab === tab.id
+                ? 'border-[#C65D32] text-[#C65D32]'
+                : 'border-transparent text-[#706B66] hover:text-[#222222]'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* TAB 1: Structured Notes */}
       {activeTab === 'notes' && (
-        <div className="space-y-8 leading-relaxed text-[#252525]">
-          
-          {/* Key Takeaways Callout */}
-          {topic.takeaways && topic.takeaways.length > 0 && (
-            <div className="p-5 bg-[#FBF4EE] border-l-4 border-l-[#C65D32] border border-[#ECD0C0] rounded-r-xl space-y-2">
-              <div className="text-xs font-bold uppercase tracking-wider text-[#983E1A] flex items-center gap-1.5">
-                <Sparkles size={15} className="text-[#C65D32]" />
-                <span>Executive Synthesis & Invariant Principles</span>
-              </div>
-              <ul className="space-y-2 pt-1">
-                {topic.takeaways.map((takeaway, idx) => (
-                  <li key={idx} className="text-xs sm:text-sm text-[#252525] flex items-start gap-2.5">
-                    <span className="font-mono text-[#C65D32] font-bold text-xs mt-0.5">
-                      0{idx + 1}.
-                    </span>
-                    <span className="leading-relaxed">{takeaway}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Quick Clickable Term Inspector */}
-          {topic.keywords && topic.keywords.length > 0 && (
-            <div className="p-4 bg-white border border-[#E7E0D8] rounded-xl space-y-2.5 shadow-subtle card-interactive">
-              <div className="text-xs font-bold uppercase tracking-wider text-[#706B66] flex items-center justify-between">
-                <span>Core Highlighted Terms in this topic (click for definition):</span>
-                <span className="text-[11px] text-[#706B66] font-normal">Interactive Glossary</span>
-              </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                {topic.keywords.map((kw, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveKeywordModal(kw)}
-                    className="text-xs px-3 py-1 rounded-lg bg-[#FAF8F5] hover:bg-[#FBF4EE] text-[#252525] hover:text-[#C65D32] border border-[#E7E0D8] hover:border-[#ECD0C0] transition-colors font-bold flex items-center gap-1.5 shadow-xs btn-tactile"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#C65D32]"></span>
-                    <span>{kw.term}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Sectional content breakdown */}
-          <div className="space-y-8 pt-2">
-            {topic.sections?.map((section, idx) => (
-              <section key={idx} className="space-y-3 bg-white p-6 sm:p-7 rounded-2xl border border-[#E7E0D8] shadow-card card-interactive">
-                <h2 className="text-lg sm:text-xl font-bold text-[#222222] tracking-tight border-b border-[#E7E0D8] pb-2">
-                  {section.heading}
-                </h2>
-                <div className="text-sm sm:text-base text-[#252525] leading-relaxed font-sans space-y-3 whitespace-pre-line">
-                  {section.content}
-                </div>
-              </section>
-            ))}
-          </div>
-
-          {/* Interactive Term Highlight Legend */}
-          <div className="p-4 bg-white border border-[#E7E0D8] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-subtle card-interactive">
-            <div className="flex items-center gap-2 text-[#706B66]">
-              <Info size={16} className="text-[#C65D32] shrink-0" />
-              <span>
-                Want to drill down into formal definitions? Explore the <strong>Glossary</strong> tab or inspect key terms.
-              </span>
-            </div>
-            <button
-              onClick={() => setActiveTab('definitions')}
-              className="text-[#C65D32] hover:text-[#983E1A] font-bold self-start sm:self-auto btn-tactile"
+        <div className="space-y-8 animate-fadeIn">
+          {topic.sections?.map((section, idx) => (
+            <article 
+              key={idx}
+              className="bg-white border border-[#E7E0D8] rounded-2xl p-6 sm:p-8 shadow-card space-y-4"
             >
-              View all definitions →
-            </button>
-          </div>
-
+              <h2 className="text-lg sm:text-xl font-bold text-[#222222] tracking-tight pb-2 border-b border-[#E7E0D8]">
+                {section.heading}
+              </h2>
+              <div className="prose prose-sm max-w-none text-xs sm:text-sm text-[#252525] leading-relaxed space-y-3 whitespace-pre-line font-sans">
+                {section.content}
+              </div>
+            </article>
+          ))}
         </div>
       )}
 
       {/* TAB 2: Key Concepts */}
       {activeTab === 'keywords' && (
-        <div className="space-y-4">
-          <div className="text-xs text-[#706B66] font-semibold">
-            Core theoretical foundations, structural invariants, and mechanisms extracted from this material:
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-            {topic.keywords?.map((kw, idx) => (
-              <div 
-                key={idx}
-                className="p-5 bg-white border border-[#E7E0D8] rounded-2xl shadow-subtle space-y-2 hover:border-[#C65D32] transition-all card-interactive"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold uppercase px-2 py-0.5 rounded bg-[#FBF4EE] text-[#C65D32] border border-[#ECD0C0]">
-                    {kw.category}
-                  </span>
-                  <span className="text-xs font-mono text-[#706B66]">#0{idx + 1}</span>
-                </div>
-                <h3 className="text-base font-bold text-[#222222]">
-                  {kw.term}
-                </h3>
-                <p className="text-xs text-[#706B66] leading-relaxed">
-                  {kw.fullDef}
-                </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fadeIn">
+          {topic.keywords?.map((kw, idx) => (
+            <div
+              key={idx}
+              onClick={() => setActiveKeywordModal(kw)}
+              className="p-5 rounded-2xl bg-white border border-[#E7E0D8] hover:border-[#C65D32] transition-all space-y-2 cursor-pointer shadow-card group"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#FAF8F5] text-[#706B66] border border-[#E7E0D8]">
+                  {kw.category || 'Core Concept'}
+                </span>
+                <span className="text-xs text-[#C65D32] group-hover:translate-x-0.5 transition-transform">→</span>
               </div>
-            ))}
-          </div>
+              <h3 className="font-bold text-base text-[#222222] group-hover:text-[#C65D32] transition-colors">
+                {kw.term}
+              </h3>
+              <p className="text-xs text-[#706B66] line-clamp-2 leading-relaxed">
+                {kw.shortDef || kw.fullDef}
+              </p>
+            </div>
+          ))}
         </div>
       )}
 
       {/* TAB 3: Glossary & Definitions */}
       {activeTab === 'definitions' && (
-        <div className="space-y-4">
-          <div className="text-xs text-[#706B66] font-semibold">
-            Exact terminology, phonetics, and contextual usage for rigorous academic recall:
-          </div>
-
-          <div className="border border-[#E7E0D8] rounded-2xl bg-white divide-y divide-[#E7E0D8] overflow-hidden shadow-card">
-            {topic.definitions?.map((def, idx) => (
-              <div key={idx} className="p-5 space-y-2 hover:bg-[#FAF8F5]/60 transition-colors">
-                <div className="flex items-baseline gap-3 flex-wrap">
-                  <h3 className="text-base font-bold text-[#222222]">
-                    {def.term}
-                  </h3>
+        <div className="space-y-4 animate-fadeIn">
+          {topic.definitions?.map((def, idx) => (
+            <div 
+              key={idx}
+              className="p-6 bg-white border border-[#E7E0D8] rounded-2xl shadow-card space-y-3"
+            >
+              <div className="flex items-baseline justify-between gap-4">
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <h3 className="text-lg font-bold text-[#222222]">{def.term}</h3>
                   {def.phonetic && (
-                    <span className="font-mono text-xs text-[#706B66] bg-[#FAF8F5] border border-[#E7E0D8] px-2 py-0.5 rounded">
-                      {def.phonetic}
-                    </span>
-                  )}
-                  {def.partOfSpeech && (
-                    <span className="text-xs text-[#706B66] italic">
-                      {def.partOfSpeech}
-                    </span>
+                    <span className="text-xs font-mono text-[#706B66]">{def.phonetic}</span>
                   )}
                 </div>
-
-                <p className="text-sm text-[#252525] leading-relaxed">
-                  {def.definition}
-                </p>
-
-                {def.example && (
-                  <div className="text-xs text-[#706B66] bg-[#FAF8F5] border-l-2 border-[#C65D32] p-2.5 rounded-r italic">
-                    Example: "{def.example}"
-                  </div>
+                {def.partOfSpeech && (
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#C65D32] px-2 py-0.5 rounded bg-[#FBF4EE] border border-[#ECD0C0]">
+                    {def.partOfSpeech}
+                  </span>
                 )}
               </div>
-            ))}
-          </div>
+              <p className="text-xs sm:text-sm text-[#252525] leading-relaxed">
+                {def.definition}
+              </p>
+              {def.example && (
+                <div className="p-3 bg-[#FAF8F5] border border-[#E7E0D8] rounded-xl text-xs text-[#706B66] italic">
+                  "{def.example}"
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )}
 
       {/* TAB 4: Quiz Questions Preview */}
       {activeTab === 'quizPreview' && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-[#706B66] font-semibold">
-              Active recall deck consisting of {topic.quiz?.length || 0} multiple-choice conceptual questions.
-            </span>
+        <div className="space-y-4 animate-fadeIn">
+          <div className="p-4 bg-[#FAF5EF] border border-[#E8B786] rounded-2xl flex items-center justify-between gap-4">
+            <div className="space-y-0.5">
+              <div className="text-xs font-bold text-[#7A3216]">Active Retrieval Questions</div>
+              <div className="text-xs text-[#706B66]">Generated directly from the content above.</div>
+            </div>
             <button
               onClick={() => {
-                onStartQuiz(topic);
+                if (onStartQuiz) onStartQuiz(topic);
                 navigate(`/quiz/${topic.id}`);
               }}
-              className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] transition-colors flex items-center gap-1.5 shadow-xs btn-tactile"
+              className="btn-tactile px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-[#C65D32] hover:bg-[#B64E24] transition-colors shadow-xs"
             >
-              <span>Launch Quiz Session</span>
-              <ArrowRight size={13} />
+              Start Full Quiz
             </button>
           </div>
 
           <div className="space-y-3">
-            {topic.quiz?.map((q, idx) => (
-              <div 
-                key={q.id || idx}
-                className="p-5 bg-white border border-[#E7E0D8] rounded-2xl space-y-3 shadow-subtle card-interactive"
-              >
-                <div className="flex items-center justify-between text-xs text-[#706B66] font-mono">
-                  <span>Question 0{idx + 1}</span>
-                  <span>{q.options?.length} Options</span>
+            {topic.quiz?.map((q, qIdx) => (
+              <div key={qIdx} className="p-5 bg-white border border-[#E7E0D8] rounded-2xl shadow-xs space-y-2">
+                <div className="text-[10px] font-mono text-[#706B66] font-bold uppercase">
+                  Question {qIdx + 1}
                 </div>
-                <h4 className="text-sm font-bold text-[#222222]">
+                <div className="text-sm font-bold text-[#222222]">
                   {q.question}
-                </h4>
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                  {q.options?.map((opt, optIdx) => (
+                  {q.options?.map((opt, oIdx) => (
                     <div 
-                      key={optIdx} 
-                      className="text-xs text-[#706B66] bg-[#FAF8F5] border border-[#E7E0D8] p-2.5 rounded-lg flex items-start gap-2"
+                      key={oIdx}
+                      className="text-xs p-2 rounded-lg bg-[#FAF8F5] border border-[#E7E0D8] text-[#706B66]"
                     >
-                      <span className="font-mono text-[#706B66] font-bold">
-                        {String.fromCharCode(65 + optIdx)}.
-                      </span>
-                      <span className="line-clamp-2">{opt}</span>
+                      {String.fromCharCode(65 + oIdx)}. {opt}
                     </div>
                   ))}
                 </div>
@@ -379,60 +440,42 @@ export default function StudyMaterialView({
         </div>
       )}
 
-      {/* Bottom Call to Action for Active Recall */}
-      <div className="pt-6 border-t border-[#E7E0D8]">
-        <div className="p-6 bg-white border border-[#E7E0D8] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-card card-interactive">
-          <div className="space-y-1">
-            <div className="text-base font-bold text-[#222222]">
-              Ready to verify your retention of this material?
-            </div>
-            <div className="text-xs text-[#706B66]">
-              Take the {topic.quiz?.length || 4}-question recall quiz now to measure conceptual durability.
-            </div>
-          </div>
-          <button
-            onClick={() => {
-              onStartQuiz(topic);
-              navigate(`/quiz/${topic.id}`);
-            }}
-            className="px-5 py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide transition-colors flex items-center justify-center gap-2 self-start sm:self-auto shadow-xs btn-tactile"
-          >
-            <span>Start Recall Quiz</span>
-            <ArrowRight size={14} />
-          </button>
-        </div>
-      </div>
-
-      {/* Interactive Keyword Inspector Popover / Modal */}
+      {/* Keyword Deep Dive Modal */}
       {activeKeywordModal && (
-        <div className="fixed inset-0 bg-[#222222]/50 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-white border border-[#E7E0D8] rounded-2xl max-w-md w-full p-6 shadow-card space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-[#FBF4EE] text-[#C65D32] border border-[#ECD0C0]">
-                {activeKeywordModal.category || "Core Concept"}
-              </span>
+        <div className="fixed inset-0 z-50 bg-[#222222]/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-[#E7E0D8] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl animate-in zoom-in-95 duration-150">
+            <div className="flex items-start justify-between">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#C65D32]">
+                  {activeKeywordModal.category || 'Core Concept'}
+                </span>
+                <h3 className="text-xl font-extrabold text-[#222222] mt-0.5">
+                  {activeKeywordModal.term}
+                </h3>
+              </div>
               <button
                 onClick={() => setActiveKeywordModal(null)}
-                className="text-[#706B66] hover:text-[#222222] p-1 rounded-md transition-colors btn-tactile"
+                className="p-1 rounded-lg text-[#706B66] hover:text-[#222222] hover:bg-[#FAF8F5]"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <h3 className="text-lg font-bold text-[#222222]">
-              {activeKeywordModal.term}
-            </h3>
-
-            <p className="text-sm text-[#252525] leading-relaxed">
-              {activeKeywordModal.fullDef || activeKeywordModal.shortDef}
-            </p>
+            <div className="space-y-2 text-xs sm:text-sm text-[#252525] leading-relaxed">
+              <p className="font-semibold text-[#222222]">
+                {activeKeywordModal.shortDef}
+              </p>
+              <p className="text-[#706B66]">
+                {activeKeywordModal.fullDef}
+              </p>
+            </div>
 
             <div className="pt-2 flex justify-end">
               <button
                 onClick={() => setActiveKeywordModal(null)}
-                className="px-4 py-2 rounded-xl bg-[#F7F3ED] hover:bg-[#EFE9DF] text-[#222222] text-xs font-bold transition-colors btn-tactile"
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-[#FAF8F5] hover:bg-[#FBF4EE] text-[#222222] border border-[#E7E0D8]"
               >
-                Got it
+                Close
               </button>
             </div>
           </div>

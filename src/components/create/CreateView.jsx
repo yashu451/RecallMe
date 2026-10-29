@@ -7,7 +7,8 @@ import {
   Square, 
   ArrowRight, 
   Loader2, 
-  Trash2 
+  Sparkles,
+  AlertCircle 
 } from 'lucide-react';
 
 export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
@@ -18,6 +19,7 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationStep, setGenerationStep] = useState('');
   const [generationProgress, setGenerationProgress] = useState(0);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   // Generation options
   const [options, setOptions] = useState({
@@ -40,23 +42,25 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
     if (!text.trim()) return;
 
     setIsGenerating(true);
+    setErrorMessage(null);
     setGenerationProgress(25);
-    setGenerationStep('Contacting RecallMe AI Engine & extracting concepts...');
+    setGenerationStep('Contacting RecallMe AI Engine & parsing text...');
 
     const timer1 = setTimeout(() => {
       setGenerationProgress(65);
-      setGenerationStep('Isolating domain invariants & terminology...');
+      setGenerationStep('Extracting key concepts, invariants & terminology...');
     }, 600);
 
     const timer2 = setTimeout(() => {
       setGenerationProgress(90);
-      setGenerationStep('Formulating active recall questions & explanations...');
+      setGenerationStep('Synthesizing structured notes & recall quiz questions...');
     }, 1200);
 
     try {
       await onGenerate(text, title, options, subject);
     } catch (err) {
       console.error('Generation error:', err);
+      setErrorMessage(err.message || 'Failed to generate study notes. Please try again.');
     } finally {
       clearTimeout(timer1);
       clearTimeout(timer2);
@@ -90,6 +94,14 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
           Paste your lecture transcript, textbook chapter, or research paper excerpt. RecallMe extracts structured summaries, key terminology, and an active recall quiz.
         </p>
       </div>
+
+      {/* Error Message if Generation Fails */}
+      {errorMessage && (
+        <div className="p-4 bg-[#FDF1F1] border border-[#F2C6C6] rounded-2xl flex items-center gap-3 text-xs text-[#B93838]">
+          <AlertCircle size={16} className="shrink-0" />
+          <span>{errorMessage}</span>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         
@@ -139,134 +151,103 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
             </div>
           </div>
 
-          <div className="relative">
-            <textarea
-              rows={12}
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Paste raw lecture excerpts, article text, or syllabus concepts here...&#10;&#10;Supports raw text, bullet points, and mathematical or scientific terminology."
-              className="input-glow w-full text-sm font-sans text-[#252525] placeholder:text-[#706B66]/60 bg-white border border-[#E7E0D8] rounded-2xl p-4 focus:outline-none focus:bg-white leading-relaxed resize-y shadow-xs"
-              required
-            />
-          </div>
-
-          {text.trim() && (
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => setText('')}
-                className="btn-tactile text-xs text-[#706B66] hover:text-[#B93838] flex items-center gap-1 pt-0.5 font-bold"
-              >
-                <Trash2 size={12} />
-                <span>Clear text</span>
-              </button>
-            </div>
-          )}
+          <textarea
+            rows={10}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Paste raw lecture text, textbook excerpts, or Markdown notes here..."
+            className="input-glow w-full text-sm bg-white border border-[#E7E0D8] rounded-2xl p-4 sm:p-5 text-[#252525] focus:outline-none focus:bg-white font-sans shadow-xs leading-relaxed resize-y"
+          />
         </div>
 
-        {/* What to generate options */}
-        <div className="border border-[#E7E0D8] rounded-2xl bg-white p-5 sm:p-6 space-y-3 shadow-subtle">
-          <div className="space-y-0.5">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#222222]">
-              What should RecallMe generate?
-            </h3>
-            <p className="text-xs text-[#706B66]">
-              Customize the active recall deck based on your study session requirements.
-            </p>
+        {/* Generation Preferences */}
+        <div className="bg-white border border-[#E7E0D8] rounded-2xl p-5 sm:p-6 shadow-card space-y-4">
+          <div className="text-xs font-bold uppercase tracking-wider text-[#706B66]">
+            Configure What RecallMe Synthesizes
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* Notes */}
             <div 
               onClick={() => toggleOption('notes')}
-              className={`card-interactive p-3.5 rounded-xl border text-left cursor-pointer flex items-start gap-3 ${
+              className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
                 options.notes 
-                  ? 'bg-[#FBF4EE] border-[#C65D32] ring-1 ring-[#C65D32]' 
-                  : 'bg-[#FAF8F5] border-[#E7E0D8] opacity-60'
+                  ? 'bg-[#FBF4EE] border-[#C65D32]' 
+                  : 'bg-[#FAF8F5] border-[#E7E0D8]'
               }`}
             >
-              <div className="mt-0.5 text-[#C65D32]">
-                {options.notes ? <CheckSquare size={17} /> : <Square size={17} />}
+              <div className="space-y-0.5">
+                <div className="text-xs font-bold text-[#222222]">Structured Notes</div>
+                <div className="text-[11px] text-[#706B66]">Hierarchical sections with core takeaways.</div>
               </div>
-              <div>
-                <div className="text-xs font-bold text-[#222222]">Structured Study Notes</div>
-                <div className="text-[11px] text-[#706B66]">Organized headings, takeaways, and conceptual synthesis.</div>
-              </div>
+              {options.notes ? <CheckSquare size={16} className="text-[#C65D32]" /> : <Square size={16} className="text-[#706B66]" />}
             </div>
 
             {/* Keywords */}
             <div 
               onClick={() => toggleOption('keywords')}
-              className={`card-interactive p-3.5 rounded-xl border text-left cursor-pointer flex items-start gap-3 ${
+              className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
                 options.keywords 
-                  ? 'bg-[#FBF4EE] border-[#C65D32] ring-1 ring-[#C65D32]' 
-                  : 'bg-[#FAF8F5] border-[#E7E0D8] opacity-60'
+                  ? 'bg-[#FBF4EE] border-[#C65D32]' 
+                  : 'bg-[#FAF8F5] border-[#E7E0D8]'
               }`}
             >
-              <div className="mt-0.5 text-[#C65D32]">
-                {options.keywords ? <CheckSquare size={17} /> : <Square size={17} />}
+              <div className="space-y-0.5">
+                <div className="text-xs font-bold text-[#222222]">Key Concepts</div>
+                <div className="text-[11px] text-[#706B66]">Essential terms with short & long definitions.</div>
               </div>
-              <div>
-                <div className="text-xs font-bold text-[#222222]">Key Concepts & Terms</div>
-                <div className="text-[11px] text-[#706B66]">Interactive inline highlights with detailed explanations.</div>
-              </div>
+              {options.keywords ? <CheckSquare size={16} className="text-[#C65D32]" /> : <Square size={16} className="text-[#706B66]" />}
             </div>
 
             {/* Definitions */}
             <div 
               onClick={() => toggleOption('definitions')}
-              className={`card-interactive p-3.5 rounded-xl border text-left cursor-pointer flex items-start gap-3 ${
+              className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
                 options.definitions 
-                  ? 'bg-[#FBF4EE] border-[#C65D32] ring-1 ring-[#C65D32]' 
-                  : 'bg-[#FAF8F5] border-[#E7E0D8] opacity-60'
+                  ? 'bg-[#FBF4EE] border-[#C65D32]' 
+                  : 'bg-[#FAF8F5] border-[#E7E0D8]'
               }`}
             >
-              <div className="mt-0.5 text-[#C65D32]">
-                {options.definitions ? <CheckSquare size={17} /> : <Square size={17} />}
+              <div className="space-y-0.5">
+                <div className="text-xs font-bold text-[#222222]">Glossary & Pronunciation</div>
+                <div className="text-[11px] text-[#706B66]">Formal definitions with contextual examples.</div>
               </div>
-              <div>
-                <div className="text-xs font-bold text-[#222222]">Glossary & Definitions</div>
-                <div className="text-[11px] text-[#706B66]">Etymologies, precise meanings, and practical examples.</div>
-              </div>
+              {options.definitions ? <CheckSquare size={16} className="text-[#C65D32]" /> : <Square size={16} className="text-[#706B66]" />}
             </div>
 
             {/* Quiz */}
             <div 
               onClick={() => toggleOption('quiz')}
-              className={`card-interactive p-3.5 rounded-xl border text-left cursor-pointer flex items-start gap-3 ${
+              className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
                 options.quiz 
-                  ? 'bg-[#FBF4EE] border-[#C65D32] ring-1 ring-[#C65D32]' 
-                  : 'bg-[#FAF8F5] border-[#E7E0D8] opacity-60'
+                  ? 'bg-[#FBF4EE] border-[#C65D32]' 
+                  : 'bg-[#FAF8F5] border-[#E7E0D8]'
               }`}
             >
-              <div className="mt-0.5 text-[#C65D32]">
-                {options.quiz ? <CheckSquare size={17} /> : <Square size={17} />}
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#222222]">Active Recall Quiz</span>
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-[#222222]">Practice Recall Quiz</span>
                   {options.quiz && (
                     <select
                       value={options.quizCount}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        setOptions(prev => ({ ...prev, quizCount: Number(e.target.value) }));
-                      }}
-                      className="text-[11px] font-mono border border-[#E7E0D8] rounded px-2 py-0.5 bg-white text-[#252525]"
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={(e) => setOptions(prev => ({ ...prev, quizCount: parseInt(e.target.value) }))}
+                      className="text-[10px] font-bold py-0.5 px-1.5 rounded bg-white border border-[#E7E0D8] text-[#C65D32]"
                     >
                       <option value={3}>3 Questions</option>
                       <option value={5}>5 Questions</option>
-                      <option value={8}>8 Questions</option>
+                      <option value={10}>10 Questions</option>
                     </select>
                   )}
                 </div>
-                <div className="text-[11px] text-[#706B66]">Retrieval testing with explanations.</div>
+                <div className="text-[11px] text-[#706B66]">Active retrieval testing with explanations.</div>
               </div>
+              {options.quiz ? <CheckSquare size={16} className="text-[#C65D32]" /> : <Square size={16} className="text-[#706B66]" />}
             </div>
           </div>
         </div>
 
-        {/* Action Button & Enhanced Elegant Progress */}
+        {/* Action Button & Enhanced Progress */}
         <div className="pt-2">
           {isGenerating ? (
             <div className="p-5 bg-[#FBF4EE] border border-[#ECD0C0] rounded-2xl space-y-3 animate-fadeIn shadow-subtle">
@@ -301,7 +282,8 @@ export default function CreateView({ onGenerate, onCancel, initialText = '' }) {
                 disabled={!text.trim()}
                 className="btn-tactile w-full sm:w-auto px-6 py-3 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide shadow-xs flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                <span>Generate Study Material</span>
+                <Sparkles size={14} />
+                <span>Generate Study Notes</span>
                 <ArrowRight size={14} />
               </button>
             </div>

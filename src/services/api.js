@@ -67,8 +67,14 @@ export async function checkBackendHealth() {
   return null;
 }
 
+/**
+ * Generate study materials without auto-saving to SQLite database.
+ * Notes are saved to SQLite only when the user explicitly clicks "Save to My Library".
+ */
 export async function generateStudyMaterial(text, title = '', subject = 'General Science', options = {}) {
   const userId = getActiveUserId();
+  const saveToDb = Boolean(options && options.saveToDb);
+
   try {
     const res = await fetch(`${API_BASE_URL}/generate`, {
       method: 'POST',
@@ -82,7 +88,7 @@ export async function generateStudyMaterial(text, title = '', subject = 'General
         subject,
         options,
         userId,
-        saveToDb: true
+        saveToDb
       }),
       signal: AbortSignal.timeout(30000)
     });
@@ -95,9 +101,11 @@ export async function generateStudyMaterial(text, title = '', subject = 'General
     console.warn('[API] Backend unreachable, falling back to local generator:', err.message);
   }
 
-  // Graceful fallback to client-side generator
+  // Graceful fallback to client-side generator if backend is offline
   const { generateStudyMaterialFromText } = await import('../utils/studyGenerator');
-  return generateStudyMaterialFromText(text, title, options);
+  const generated = generateStudyMaterialFromText(text, title, options);
+  if (subject) generated.subject = subject;
+  return generated;
 }
 
 export async function fetchTopics() {
@@ -113,6 +121,20 @@ export async function fetchTopics() {
     }
   } catch (err) {
     console.warn('[API] Could not fetch topics from backend, using local state.');
+  }
+  return null;
+}
+
+export async function fetchTopicById(id) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/topics/${encodeURIComponent(id)}`, {
+      signal: AbortSignal.timeout(3000)
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn(`[API] Could not fetch topic ${id} from backend:`, err.message);
   }
   return null;
 }

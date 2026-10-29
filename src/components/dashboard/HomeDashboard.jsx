@@ -16,7 +16,8 @@ import {
   Layers,
   HelpCircle,
   Check,
-  RefreshCw
+  RefreshCw,
+  Loader2
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -59,11 +60,14 @@ export default function HomeDashboard({
   topics = [], 
   onSelectTopic, 
   onStartQuiz, 
-  onCreateFromQuickInput 
+  onCreateFromQuickInput,
+  onGenerateNotes 
 }) {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [quickInput, setQuickInput] = useState('');
+  const [isGeneratingNotes, setIsGeneratingNotes] = useState(false);
+  const [generateError, setGenerateError] = useState(null);
 
   // 1. Dynamic Mean Retention Score
   const studiedTopics = (topics || []).filter(t => (t.masteryScore || 0) > 0);
@@ -113,11 +117,30 @@ export default function HomeDashboard({
     setCardFeedback('review_again');
   };
 
-  const handleQuickSubmit = (e) => {
+  const handleQuickSubmit = async (e) => {
     e.preventDefault();
-    if (!quickInput.trim()) return;
-    onCreateFromQuickInput(quickInput);
-    navigate('/create');
+    if (!quickInput.trim() || isGeneratingNotes) return;
+
+    if (typeof onGenerateNotes === 'function') {
+      setIsGeneratingNotes(true);
+      setGenerateError(null);
+      try {
+        const created = await onGenerateNotes(quickInput.trim());
+        navigate(`/study/${created.id}`, { state: { topic: created, isNew: true } });
+      } catch (err) {
+        console.error('Failed to generate study notes:', err);
+        setGenerateError(err.message || 'Generation failed. Opening editor...');
+        setTimeout(() => {
+          if (onCreateFromQuickInput) onCreateFromQuickInput(quickInput);
+          navigate('/create');
+        }, 1200);
+      } finally {
+        setIsGeneratingNotes(false);
+      }
+    } else {
+      if (onCreateFromQuickInput) onCreateFromQuickInput(quickInput);
+      navigate('/create');
+    }
   };
 
   return (
@@ -158,76 +181,83 @@ export default function HomeDashboard({
 
       {/* 2. Interactive Flashcard of the Day */}
       <section className="bg-gradient-to-br from-[#FAF8F5] via-[#FFFDFB] to-[#FBF4EE] border border-[#E7E0D8] rounded-2xl p-5 sm:p-6 shadow-card space-y-4 relative overflow-hidden card-tactile">
-        <div className="flex items-center justify-between gap-2 border-b border-[#E7E0D8]/60 pb-3">
+        {/* Subtle decorative background watermarks */}
+        <div className="absolute top-0 right-0 -mt-6 -mr-6 w-32 h-32 bg-[#E8B786]/20 rounded-full blur-2xl pointer-events-none" />
+
+        <div className="flex items-center justify-between border-b border-[#E7E0D8] pb-3">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-[#C65D32]/10 text-[#C65D32] flex items-center justify-center">
-              <Zap size={14} className="fill-[#C65D32]" />
-            </div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#222222]">
-              Flashcard of the Day
+            <span className="w-2.5 h-2.5 rounded-full bg-[#C65D32]"></span>
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#C65D32]">
+              Daily Recall Flashcard
             </span>
-            <span className="text-[11px] font-mono text-[#706B66] bg-white px-2 py-0.5 rounded-md border border-[#E7E0D8]">
-              {currentCard.code} • {currentCard.subject}
-            </span>
+            <span className="text-[#E7E0D8]">•</span>
+            <span className="text-xs font-mono text-[#706B66]">{currentCard.subject} ({currentCard.code})</span>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-mono text-[#706B66] hidden sm:inline">
+            <span className="text-xs text-[#706B66] font-mono">
               Card {currentCardIndex + 1} of {DAILY_FLASHCARDS.length}
             </span>
-            <button
-              onClick={handleNextCard}
-              className="text-xs font-bold text-[#706B66] hover:text-[#C65D32] flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-white transition-colors"
-              title="Next concept card"
-            >
-              <RefreshCw size={12} />
-              <span>Next</span>
-            </button>
           </div>
         </div>
 
-        {/* 3D Flip Card Container */}
+        {/* 3D Flip Flashcard Container */}
         <div 
+          className="relative min-h-[170px] cursor-pointer group perspective-1000"
           onClick={() => setIsFlipped(!isFlipped)}
-          className="relative min-h-[160px] sm:min-h-[140px] cursor-pointer select-none group perspective-1000"
         >
-          <div className="bg-white border border-[#E7E0D8] rounded-xl p-5 shadow-subtle transition-all duration-300 group-hover:border-[#ECD0C0] relative min-h-[150px] flex flex-col justify-between">
+          <div 
+            className={`w-full h-full min-h-[170px] rounded-2xl p-6 transition-all duration-300 transform flex flex-col justify-between shadow-subtle border ${
+              isFlipped 
+                ? 'bg-[#222222] text-[#F7F3ED] border-[#222222]' 
+                : 'bg-white text-[#222222] border-[#E7E0D8] hover:border-[#C65D32]'
+            }`}
+          >
+            {/* Front Side: Question */}
             {!isFlipped ? (
-              <>
-                <div className="space-y-2">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-[#C65D32] flex items-center gap-1.5">
-                    <HelpCircle size={13} />
-                    <span>Active Recall Prompt — Click anywhere to reveal answer</span>
-                  </div>
-                  <h3 className="text-base sm:text-lg font-bold text-[#222222] leading-snug">
-                    {currentCard.question}
-                  </h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-[#C65D32] font-bold">
+                    Question • Click to reveal
+                  </span>
+                  <span className="text-xs text-[#706B66] font-medium group-hover:text-[#C65D32] transition-colors flex items-center gap-1">
+                    <span>Reveal Answer</span>
+                    <RotateCcw size={13} />
+                  </span>
                 </div>
-                <div className="text-[11px] text-[#706B66] font-medium flex items-center gap-1 pt-2">
-                  <RotateCcw size={12} className="group-hover:rotate-45 transition-transform" />
-                  <span>Click card to test your memory</span>
-                </div>
-              </>
+                <h3 className="text-lg sm:text-xl font-bold leading-snug tracking-tight text-[#222222]">
+                  {currentCard.question}
+                </h3>
+              </div>
             ) : (
-              <>
-                <div className="space-y-2">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-[#38765C] flex items-center gap-1.5">
-                    <CheckCircle2 size={13} />
-                    <span>Core Synthesis & Retention Answer</span>
-                  </div>
-                  <p className="text-xs sm:text-sm text-[#252525] leading-relaxed">
-                    {currentCard.answer}
-                  </p>
-                  <p className="text-[11px] text-[#706B66] italic bg-[#FAF8F5] p-2 rounded-lg border border-[#E7E0D8]">
-                    <strong>Key takeaway:</strong> {currentCard.insight}
-                  </p>
+              /* Back Side: Answer & Insight */
+              <div className="space-y-3 animate-fadeIn">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-[#E8B786] font-bold flex items-center gap-1">
+                    <CheckCircle2 size={13} className="text-[#E8B786]" />
+                    <span>Verified Active Retrieval Answer</span>
+                  </span>
+                  <span className="text-xs text-[#E8B786] font-medium flex items-center gap-1">
+                    <span>Flip Back</span>
+                    <RotateCcw size={12} />
+                  </span>
                 </div>
-                <div className="text-[11px] text-[#706B66] flex items-center gap-1 pt-2">
-                  <RotateCcw size={12} />
-                  <span>Click to flip back</span>
+                <p className="text-sm sm:text-base font-medium text-[#F7F3ED] leading-relaxed">
+                  {currentCard.answer}
+                </p>
+                <div className="text-xs text-[#E8B786] font-mono pt-1">
+                  Key Insight: {currentCard.insight}
                 </div>
-              </>
+              </div>
             )}
+
+            {/* Bottom helper info */}
+            <div className={`text-[11px] pt-3 flex items-center justify-between border-t ${
+              isFlipped ? 'border-white/10 text-white/60' : 'border-[#E7E0D8] text-[#706B66]'
+            }`}>
+              <span>Topic: {currentCard.subject}</span>
+              <span className="italic">{isFlipped ? 'Click again to view question' : 'Click card to flip'}</span>
+            </div>
           </div>
         </div>
 
@@ -287,25 +317,41 @@ export default function HomeDashboard({
           </span>
         </div>
 
+        {generateError && (
+          <div className="p-3 bg-[#FDF1F1] border border-[#F2C6C6] rounded-xl text-xs text-[#B93838]">
+            {generateError}
+          </div>
+        )}
+
         <form onSubmit={handleQuickSubmit} className="space-y-3">
           <div className="relative">
             <textarea
               rows={3}
               value={quickInput}
+              disabled={isGeneratingNotes}
               onChange={(e) => setQuickInput(e.target.value)}
               placeholder="e.g., 'Today we covered how the Taylor Rule specifies that central banks raise nominal rates more than 1:1 when inflation rises...' or paste paper excerpts"
-              className="w-full text-sm text-[#252525] placeholder:text-[#706B66]/60 bg-[#FAF8F5] border border-[#E7E0D8] rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:bg-white transition-all leading-relaxed resize-y font-sans"
+              className="w-full text-sm text-[#252525] placeholder:text-[#706B66]/60 bg-[#FAF8F5] border border-[#E7E0D8] rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-[#C65D32] focus:bg-white transition-all leading-relaxed resize-y font-sans disabled:opacity-50"
             />
           </div>
 
           <div className="flex items-center justify-end pt-1">
             <button
               type="submit"
-              disabled={!quickInput.trim()}
+              disabled={!quickInput.trim() || isGeneratingNotes}
               className="btn-tactile w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#C65D32] hover:bg-[#B64E24] text-white text-xs font-bold tracking-wide shadow-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <span>Create study notes</span>
-              <ArrowRight size={14} />
+              {isGeneratingNotes ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  <span>Synthesizing study notes...</span>
+                </>
+              ) : (
+                <>
+                  <span>Create study notes</span>
+                  <ArrowRight size={14} />
+                </>
+              )}
             </button>
           </div>
         </form>
@@ -318,21 +364,21 @@ export default function HomeDashboard({
             <TrendingUp size={15} className="text-[#C65D32]" />
             <span>Retention Velocity & Progress</span>
           </h2>
-          <span className="text-xs text-[#706B66] font-medium">
-            Weekly Target: <strong className="text-[#C65D32] font-bold">{topics.length} / 5 Topics</strong>
-          </span>
+          <span className="text-xs font-mono font-medium text-[#706B66]">Updated Just Now</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
-          {/* Stat 1: Mean Retention Score */}
-          <div className="card-tactile p-4 bg-white border border-[#E7E0D8] rounded-xl shadow-subtle space-y-2">
-            <div className="text-[11px] font-bold text-[#706B66] uppercase tracking-wider">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Card 1: Mean Retention Score */}
+          <div className="p-5 bg-white border border-[#E7E0D8] rounded-2xl shadow-card space-y-2 card-tactile">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-[#706B66]">
               Mean Retention Score
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-extrabold text-[#222222]">{meanScore}%</span>
-              <span className="text-xs text-[#38765C] font-bold">
-                {studiedTopics.length > 0 ? `${studiedTopics.length} topics tested` : 'Take a quiz to score'}
+              <span className="text-3xl sm:text-4xl font-extrabold text-[#222222] tracking-tight">
+                {meanScore}%
+              </span>
+              <span className="text-xs font-mono text-[#38765C] font-bold">
+                {studiedTopics.length > 0 ? `${studiedTopics.length} studied` : 'Start studying'}
               </span>
             </div>
             <div className="w-full bg-[#FAF8F5] border border-[#E7E0D8] h-2 rounded-full overflow-hidden">
@@ -341,62 +387,76 @@ export default function HomeDashboard({
                 style={{ width: `${meanScore}%` }}
               ></div>
             </div>
+            <div className="text-[11px] text-[#706B66] pt-0.5">
+              Target &gt; 80% for long-term memory consolidation
+            </div>
           </div>
 
-          {/* Stat 2: Active Concepts Mastered */}
-          <div className="card-tactile p-4 bg-white border border-[#E7E0D8] rounded-xl shadow-subtle space-y-2">
-            <div className="text-[11px] font-bold text-[#706B66] uppercase tracking-wider">
-              Active Concepts Mastered
+          {/* Card 2: Active Concepts Mastered */}
+          <div className="p-5 bg-white border border-[#E7E0D8] rounded-2xl shadow-card space-y-2 card-tactile">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-[#706B66]">
+              Concepts Mastered
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-extrabold text-[#222222]">{totalConcepts}</span>
-              <span className="text-xs text-[#706B66] font-medium">across {uniqueDomains} domain{uniqueDomains === 1 ? '' : 's'}</span>
+              <span className="text-3xl sm:text-4xl font-extrabold text-[#222222] tracking-tight">
+                {totalConcepts}
+              </span>
+              <span className="text-xs text-[#706B66]">in {uniqueDomains} domains</span>
             </div>
-            <p className="text-[11px] text-[#706B66] truncate">
-              Recent: {recentConcept}
-            </p>
+            <div className="text-xs text-[#706B66] truncate pt-1">
+              Latest: <span className="text-[#222222] font-semibold">{recentConcept}</span>
+            </div>
+            <div className="text-[11px] text-[#C65D32] font-semibold flex items-center gap-1">
+              <Zap size={12} />
+              <span>Active retrieval active</span>
+            </div>
           </div>
 
-          {/* Stat 3: 7-Day Recall Rhythm */}
-          <div className="card-tactile p-4 bg-white border border-[#E7E0D8] rounded-xl shadow-subtle space-y-2">
-            <div className="text-[11px] font-bold text-[#706B66] uppercase tracking-wider">
-              7-Day Recall Rhythm
+          {/* Card 3: 7-Day Recall Rhythm */}
+          <div className="p-5 bg-white border border-[#E7E0D8] rounded-2xl shadow-card space-y-2 card-tactile">
+            <div className="flex items-center justify-between">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-[#706B66]">
+                7-Day Recall Rhythm
+              </div>
+              <span className="text-xs font-mono text-[#C65D32] font-bold">
+                {currentUser?.streak ?? 0}d streak
+              </span>
             </div>
-            <div className="flex items-center justify-between gap-1 pt-1">
-              {rhythmDays.map((item, i) => (
-                <div key={i} className="flex flex-col items-center gap-1">
-                  <div
-                    className={`w-6 h-6 rounded-lg flex items-center justify-center text-[11px] font-bold ${
-                      item.today && item.active
-                        ? 'bg-[#C65D32] text-white shadow-xs'
-                        : item.active
-                        ? 'bg-[#222222] text-[#F7F3ED] font-semibold'
-                        : item.today
-                        ? 'bg-[#FAF5EF] text-[#C65D32] border border-[#ECD0C0]'
-                        : 'bg-[#F7F3ED] text-[#706B66]/40 border border-[#E7E0D8]'
+
+            <div className="flex items-center justify-between gap-1.5 pt-2">
+              {rhythmDays.map((d, i) => (
+                <div key={i} className="flex flex-col items-center gap-1.5">
+                  <div 
+                    className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-mono font-bold transition-all ${
+                      d.today 
+                        ? 'bg-[#C65D32] text-white ring-2 ring-[#C65D32] ring-offset-2' 
+                        : d.active 
+                          ? 'bg-[#222222] text-[#F7F3ED]' 
+                          : 'bg-[#FAF8F5] text-[#706B66] border border-[#E7E0D8]'
                     }`}
                   >
-                    {item.active ? '✓' : '•'}
+                    {d.day}
                   </div>
-                  <span className={`text-[10px] font-semibold ${item.today ? 'text-[#C65D32]' : 'text-[#706B66]'}`}>
-                    {item.day}
-                  </span>
                 </div>
               ))}
+            </div>
+            <div className="text-[11px] text-[#706B66] pt-1 text-center font-mono">
+              Consecutive Daily Recall
             </div>
           </div>
         </div>
       </section>
 
       {/* 5. Recently Studied Topics */}
-      <section className="space-y-3">
+      <section className="space-y-4">
         <div className="flex items-center justify-between border-b border-[#E7E0D8] pb-2">
-          <div className="flex items-center gap-2">
-            <BookOpen size={15} className="text-[#C65D32]" />
-            <h2 className="text-xs font-bold uppercase tracking-wider text-[#706B66]">
+          <div className="space-y-0.5">
+            <h2 className="text-sm font-bold text-[#222222] tracking-tight">
               Recently Studied Topics
             </h2>
-            <span className="text-xs font-mono text-[#706B66]">({topics.length})</span>
+            <p className="text-xs text-[#706B66]">
+              Pick up where you left off or retake a practice quiz to reinforce memory traces.
+            </p>
           </div>
           <button 
             onClick={() => navigate('/library')}

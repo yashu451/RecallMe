@@ -245,3 +245,4 @@ export function generateGroundedQuestionsFromNotes(notes = [], difficulty = 'Med
 
   return result.slice(0, targetCount);
 }
+

@@ -11,7 +11,8 @@ const router = express.Router();
  */
 router.post('/', async (req, res) => {
   try {
-    const { text, title, subject, options, saveToDb } = req.body;
+    const { text, title, subject, options, saveToDb, userId: bodyUserId } = req.body;
+    const userId = bodyUserId || req.headers['x-user-id'] || null;
 
     if (!text || !text.trim()) {
       return res.status(400).json({ error: 'Source text is required' });
@@ -20,7 +21,11 @@ router.post('/', async (req, res) => {
     console.log(`[API /api/generate] Processing text (${text.length} chars), title: "${title || 'Auto'}"`);
     const generated = await generateWithGemini(text, title, subject, options);
 
-    if (saveToDb) {
+    if (userId) {
+      generated.userId = userId;
+    }
+
+    if (saveToDb === true) {
       await saveTopic(generated);
     }
 

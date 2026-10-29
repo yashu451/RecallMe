@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useParams, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/layout/Navbar';
 import LandingPage from './components/landing/LandingPage';
@@ -18,6 +18,8 @@ import QuizHistoryView from './components/quiz/QuizHistoryView';
 import { 
   generateStudyMaterial, 
   fetchTopics, 
+  fetchTopicById,
+  persistTopic,
   toggleTopicStarBackend, 
   deleteTopicBackend, 
   fetchQuizHistory, 
@@ -27,14 +29,54 @@ import {
 import AmbientBackground from './components/common/AmbientBackground';
 
 // Wrapper to find topic by ID for Study view
-function StudyRouteWrapper({ topics, onStartQuiz, onToggleStar }) {
+function StudyRouteWrapper({ topics, onStartQuiz, onToggleStar, onSaveTopic }) {
   const { id } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
-  const topic = topics.find(t => t.id === id) || topics[0];
+
+  // 1. Topic might be passed in location.state (freshly generated note result)
+  const stateTopic = location.state?.topic;
+
+  // 2. Topic might be found in saved topics array
+  const foundTopic = topics.find(t => t.id === id);
+
+  // 3. Fallback: fetch topic by ID from backend SQLite if refreshed or opened directly
+  const [fetchedTopic, setFetchedTopic] = useState(null);
+  const [loading, setLoading] = useState(!stateTopic && !foundTopic && Boolean(id));
+
+  useEffect(() => {
+    if (stateTopic || foundTopic) {
+      setLoading(false);
+      return;
+    }
+
+    if (id) {
+      let isMounted = true;
+      setLoading(true);
+      fetchTopicById(id)
+        .then(t => {
+          if (isMounted && t) {
+            setFetchedTopic(t);
+          }
+        })
+        .finally(() => {
+          if (isMounted) setLoading(false);
+        });
+      return () => { isMounted = false; };
+    } else {
+      setLoading(false);
+    }
+  }, [id, stateTopic, foundTopic]);
+
+  const activeTopic = stateTopic || foundTopic || fetchedTopic || null;
+  const isSaved = Boolean(activeTopic && topics.some(t => t.id === activeTopic.id));
 
   return (
     <StudyMaterialView 
-      topic={topic}
+      topic={activeTopic}
+      isLoading={loading}
+      isSaved={isSaved}
+      onSaveToLibrary={onSaveTopic}
       onBack={() => navigate('/library')}
       onStartQuiz={onStartQuiz}
       onToggleStar={onToggleStar}
@@ -67,6 +109,7 @@ function ProtectedRoute({ children }) {
 
 function AppContent() {
   const { currentUser, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [topics, setTopics] = useState([]);
   const [activeTopicId, setActiveTopicId] = useState(null);
   const [quizHistory, setQuizHistory] = useState([]);
@@ -143,12 +186,23 @@ function AppContent() {
     await recordQuizAttempt(historyEntry);
   };
 
-  const handleGenerate = async (rawText, userTitle, options, subject) => {
-    const newTopic = await generateStudyMaterial(rawText, userTitle, subject, options);
-    setTopics(prev => [newTopic, ...prev]);
-    setActiveTopicId(newTopic.id);
+  // Generate study material (does NOT auto-save to database)
+  const handleGenerate = async (rawText, userTitle = '', subject = 'General Science', options = {}) => {
+    const generated = await generateStudyMaterial(rawText, userTitle, subject, options);
     setQuickInputDraft('');
-    return newTopic;
+    return generated;
+  };
+
+  // Save generated topic to My Library (persists to backend SQLite database)
+  const handleSaveTopic = async (topicToSave) => {
+    const saved = await persistTopic(topicToSave);
+    setTopics(prev => {
+      const exists = prev.some(t => t.id === saved.id);
+      if (exists) return prev;
+      return [saved, ...prev];
+    });
+    setActiveTopicId(saved.id);
+    return saved;
   };
 
   const handleToggleStar = async (topicId) => {
@@ -200,6 +254,10 @@ function AppContent() {
                   onSelectTopic={handleSelectTopic}
                   onStartQuiz={handleStartQuiz}
                   onCreateFromQuickInput={(text) => setQuickInputDraft(text)}
+                  onGenerateNotes={async (rawText) => {
+                    const created = await handleGenerate(rawText);
+                    return created;
+                  }}
                 />
               </ProtectedRoute>
             } 
@@ -213,16 +271,16 @@ function AppContent() {
                 <CreateView 
                   initialText={quickInputDraft}
                   onGenerate={async (rawText, title, options, subject) => {
-                    const created = await handleGenerate(rawText, title, options, subject);
-                    window.location.href = `/study/${created.id}`;
+                    const created = await handleGenerate(rawText, title, subject, options);
+                    navigate(`/study/${created.id}`, { state: { topic: created, isNew: true } });
                   }}
-                  onCancel={() => window.location.href = '/dashboard'}
+                  onCancel={() => navigate('/dashboard')}
                 />
               </ProtectedRoute>
             } 
           />
 
-          {/* Study Material View */}
+          {/* Dedicated Study Material Results View */}
           <Route 
             path="/study/:id" 
             element={
@@ -231,6 +289,7 @@ function AppContent() {
                   topics={topics}
                   onStartQuiz={handleStartQuiz}
                   onToggleStar={handleToggleStar}
+                  onSaveTopic={handleSaveTopic}
                 />
               </ProtectedRoute>
             } 
