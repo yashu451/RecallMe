@@ -1,62 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DashboardHero from './DashboardHero';
 import LearningActivityCalendar from './LearningActivityCalendar';
 import { 
   ArrowRight, 
-  Sparkles, 
   BookOpen, 
   Clock, 
-  CheckCircle2, 
-  RotateCcw, 
-  Search, 
   TrendingUp, 
   ChevronRight, 
-  Calendar, 
   Flame, 
   Zap, 
-  Layers,
-  HelpCircle,
-  Check,
-  RefreshCw,
-  Loader2
+  Loader2 
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-
-const DAILY_FLASHCARDS = [
-  {
-    id: 'fc-1',
-    subject: 'Database Systems',
-    code: 'CS 145',
-    question: 'What is the main purpose of normalization in DBMS?',
-    answer: 'Normalization decomposes relations to minimize data redundancy and prevent insertion, update, and deletion anomalies while enforcing data integrity (e.g., 1NF, 2NF, 3NF, BCNF).',
-    insight: 'Eliminates duplicate attributes and guarantees structural functional dependencies.'
-  },
-  {
-    id: 'fc-2',
-    subject: 'Distributed Systems',
-    code: 'CS 244B',
-    question: 'Why does the Raft consensus algorithm use randomized election timeouts?',
-    answer: 'Randomized election timeouts (typically 150–300ms) prevent split-vote scenarios where multiple candidate nodes start elections simultaneously and split votes evenly, ensuring a single leader emerges quickly.',
-    insight: 'Elects an unambiguous leader within a few heartbeat intervals.'
-  },
-  {
-    id: 'fc-3',
-    subject: 'Operating Systems',
-    code: 'CS 140',
-    question: 'What is the fundamental difference between a process context switch and a thread context switch?',
-    answer: 'A process switch swaps virtual memory address spaces (updating page table pointers in the CR3 register and invalidating TLB caches), whereas a thread switch only swaps CPU registers, program counter, and stack within the same address space.',
-    insight: 'Thread switches incur significantly lower overhead due to shared memory mapping.'
-  },
-  {
-    id: 'fc-4',
-    subject: 'Computer Networks',
-    code: 'CS 144',
-    question: 'Why does TCP require a three-way handshake instead of a two-way handshake?',
-    answer: 'A three-way handshake (SYN, SYN-ACK, ACK) ensures that both client and server independently verify packet delivery in both directions and synchronize initial sequence numbers (ISNs), preventing delayed duplicate packets from causing phantom sessions.',
-    insight: 'Guarantees reliable bidirectional sequence initialization.'
-  }
-];
 
 export default function HomeDashboard({ 
   topics = [], 
@@ -97,29 +52,6 @@ export default function HomeDashboard({
     };
   });
 
-  // Flashcard of the Day State
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [cardFeedback, setCardFeedback] = useState(null);
-
-  const currentCard = DAILY_FLASHCARDS[currentCardIndex];
-
-  const handleNextCard = () => {
-    setIsFlipped(false);
-    setTimeout(() => {
-      setCurrentCardIndex((prev) => (prev + 1) % DAILY_FLASHCARDS.length);
-      setCardFeedback(null);
-    }, 180);
-  };
-
-  const handleGotIt = () => {
-    setCardFeedback('got_it');
-  };
-
-  const handleReviewAgain = () => {
-    setCardFeedback('review_again');
-  };
-
   const handleQuickSubmit = async (e) => {
     e.preventDefault();
     if (!quickInput.trim() || isGeneratingNotes) return;
@@ -149,7 +81,7 @@ export default function HomeDashboard({
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
       
-      {/* 1. Header & Greeting */}
+      {/* 1. Existing Dashboard Heading and Streak Card */}
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E7E0D8] pb-6">
         <div className="space-y-1">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#222222] tracking-tight">
@@ -176,138 +108,7 @@ export default function HomeDashboard({
         </div>
       </header>
 
-      {/* Hero Section with animated 3D learning illustration */}
-      <DashboardHero />
-
-      {/* Learning Activity Calendar (full-width GitHub-style BELOW the hero section) */}
-      <LearningActivityCalendar 
-        topics={topics}
-        quizHistory={quizHistory}
-        streak={currentUser?.streak ?? 0}
-      />
-
-      {/* 2. Interactive Flashcard of the Day */}
-      <section className="bg-gradient-to-br from-[#FAF8F5] via-[#FFFDFB] to-[#FBF4EE] border border-[#E7E0D8] rounded-2xl p-5 sm:p-6 shadow-card space-y-4 relative overflow-hidden card-tactile">
-        {/* Subtle decorative background watermarks */}
-        <div className="absolute top-0 right-0 -mt-6 -mr-6 w-32 h-32 bg-[#E8B786]/20 rounded-full blur-2xl pointer-events-none" />
-
-        <div className="flex items-center justify-between border-b border-[#E7E0D8] pb-3">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#C65D32]"></span>
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#C65D32]">
-              Daily Recall Flashcard
-            </span>
-            <span className="text-[#E7E0D8]">•</span>
-            <span className="text-xs font-mono text-[#706B66]">{currentCard.subject} ({currentCard.code})</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-[#706B66] font-mono">
-              Card {currentCardIndex + 1} of {DAILY_FLASHCARDS.length}
-            </span>
-          </div>
-        </div>
-
-        {/* 3D Flip Flashcard Container */}
-        <div 
-          className="relative min-h-[170px] cursor-pointer group perspective-1000"
-          onClick={() => setIsFlipped(!isFlipped)}
-        >
-          <div 
-            className={`w-full h-full min-h-[170px] rounded-2xl p-6 transition-all duration-300 transform flex flex-col justify-between shadow-subtle border ${
-              isFlipped 
-                ? 'bg-[#222222] text-[#F7F3ED] border-[#222222]' 
-                : 'bg-white text-[#222222] border-[#E7E0D8] hover:border-[#C65D32]'
-            }`}
-          >
-            {/* Front Side: Question */}
-            {!isFlipped ? (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-[#C65D32] font-bold">
-                    Question • Click to reveal
-                  </span>
-                  <span className="text-xs text-[#706B66] font-medium group-hover:text-[#C65D32] transition-colors flex items-center gap-1">
-                    <span>Reveal Answer</span>
-                    <RotateCcw size={13} />
-                  </span>
-                </div>
-                <h3 className="text-lg sm:text-xl font-bold leading-snug tracking-tight text-[#222222]">
-                  {currentCard.question}
-                </h3>
-              </div>
-            ) : (
-              /* Back Side: Answer & Insight */
-              <div className="space-y-3 animate-fadeIn">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-[#E8B786] font-bold flex items-center gap-1">
-                    <CheckCircle2 size={13} className="text-[#E8B786]" />
-                    <span>Verified Active Retrieval Answer</span>
-                  </span>
-                  <span className="text-xs text-[#E8B786] font-medium flex items-center gap-1">
-                    <span>Flip Back</span>
-                    <RotateCcw size={12} />
-                  </span>
-                </div>
-                <p className="text-sm sm:text-base font-medium text-[#F7F3ED] leading-relaxed">
-                  {currentCard.answer}
-                </p>
-                <div className="text-xs text-[#E8B786] font-mono pt-1">
-                  Key Insight: {currentCard.insight}
-                </div>
-              </div>
-            )}
-
-            {/* Bottom helper info */}
-            <div className={`text-[11px] pt-3 flex items-center justify-between border-t ${
-              isFlipped ? 'border-white/10 text-white/60' : 'border-[#E7E0D8] text-[#706B66]'
-            }`}>
-              <span>Topic: {currentCard.subject}</span>
-              <span className="italic">{isFlipped ? 'Click again to view question' : 'Click card to flip'}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Interactive Self-Rating Buttons */}
-        {isFlipped && (
-          <div className="flex items-center justify-between gap-3 pt-1 animate-fadeIn">
-            <span className="text-xs text-[#706B66]">How well did you recall this?</span>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={handleReviewAgain}
-                className={`btn-tactile text-xs px-3 py-1.5 rounded-lg border font-bold transition-all ${
-                  cardFeedback === 'review_again'
-                    ? 'bg-[#FBF4EE] text-[#C65D32] border-[#ECD0C0]'
-                    : 'bg-white text-[#706B66] border-[#E7E0D8] hover:text-[#222222]'
-                }`}
-              >
-                Needs Review
-              </button>
-              <button
-                type="button"
-                onClick={handleGotIt}
-                className={`btn-tactile text-xs px-3 py-1.5 rounded-lg border font-bold transition-all ${
-                  cardFeedback === 'got_it'
-                    ? 'bg-[#EEF7F2] text-[#38765C] border-[#B8E2CC]'
-                    : 'bg-white text-[#706B66] border-[#E7E0D8] hover:text-[#38765C]'
-                }`}
-              >
-                Got It ✓
-              </button>
-              <button
-                type="button"
-                onClick={handleNextCard}
-                className="btn-tactile text-xs px-3 py-1.5 rounded-lg bg-[#222222] text-white font-bold hover:bg-black transition-colors"
-              >
-                Next Card →
-              </button>
-            </div>
-          </div>
-        )}
-      </section>
-
-      {/* 3. "What did you learn today?" Rapid Input */}
+      {/* 2. "What did you learn today?" Content Input */}
       <section className="bg-white border border-[#E7E0D8] rounded-2xl p-5 sm:p-7 shadow-card space-y-4 card-tactile">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
@@ -363,6 +164,13 @@ export default function HomeDashboard({
           </div>
         </form>
       </section>
+
+      {/* 3. Learning Activity Calendar (directly below "What did you learn today?") */}
+      <LearningActivityCalendar 
+        topics={topics}
+        quizHistory={quizHistory}
+        streak={currentUser?.streak ?? 0}
+      />
 
       {/* 4. Learning Activity & Retention Progress */}
       <section className="space-y-3">
