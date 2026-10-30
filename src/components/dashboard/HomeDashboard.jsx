@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import DashboardHero from './DashboardHero';
+import LearningActivityCalendar from './LearningActivityCalendar';
 import { 
   ArrowRight, 
   Sparkles, 
@@ -58,9 +60,10 @@ const DAILY_FLASHCARDS = [
 
 export default function HomeDashboard({ 
   topics = [], 
+  quizHistory = [],
   onSelectTopic, 
   onStartQuiz, 
-  onCreateFromQuickInput,
+  onCreateFromQuickInput, 
   onGenerateNotes 
 }) {
   const navigate = useNavigate();
@@ -172,6 +175,16 @@ export default function HomeDashboard({
           </div>
         </div>
       </header>
+
+      {/* Hero Section with animated 3D learning illustration */}
+      <DashboardHero />
+
+      {/* Learning Activity Calendar (full-width GitHub-style BELOW the hero section) */}
+      <LearningActivityCalendar 
+        topics={topics}
+        quizHistory={quizHistory}
+        streak={currentUser?.streak ?? 0}
+      />
 
       {/* 2. Interactive Flashcard of the Day */}
       <section className="bg-gradient-to-br from-[#FAF8F5] via-[#FFFDFB] to-[#FBF4EE] border border-[#E7E0D8] rounded-2xl p-5 sm:p-6 shadow-card space-y-4 relative overflow-hidden card-tactile">

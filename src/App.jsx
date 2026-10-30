@@ -281,6 +281,7 @@ function AppContent() {
               <ProtectedRoute>
                 <HomeDashboard 
                   topics={topics}
+                  quizHistory={quizHistory}
                   onSelectTopic={handleSelectTopic}
                   onStartQuiz={handleStartQuiz}
                   onCreateFromQuickInput={(text) => setQuickInputDraft(text)}
