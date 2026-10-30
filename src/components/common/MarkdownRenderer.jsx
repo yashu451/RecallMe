@@ -208,3 +208,4 @@ export default function MarkdownRenderer({ content, className = '' }) {
 
   return <div className={`markdown-content space-y-1 ${className}`}>{elements}</div>;
 }
+
