@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import DashboardHero from './DashboardHero';
 import LearningActivityCalendar from './LearningActivityCalendar';
 import { 
   ArrowRight, 
@@ -108,7 +109,10 @@ export default function HomeDashboard({
         </div>
       </header>
 
-      {/* 2. "What did you learn today?" Content Input */}
+      {/* 2. Hero Section – Restored animated learning-themed hero section */}
+      <DashboardHero />
+
+      {/* 3. "What did you learn today?" Content Input */}
       <section className="bg-white border border-[#E7E0D8] rounded-2xl p-5 sm:p-7 shadow-card space-y-4 card-tactile">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
@@ -165,14 +169,14 @@ export default function HomeDashboard({
         </form>
       </section>
 
-      {/* 3. Learning Activity Calendar (directly below "What did you learn today?") */}
+      {/* 4. Learning Activity Calendar (immediately below "What did you learn today?") */}
       <LearningActivityCalendar 
         topics={topics}
         quizHistory={quizHistory}
         streak={currentUser?.streak ?? 0}
       />
 
-      {/* 4. Learning Activity & Retention Progress */}
+      {/* 5. Learning Activity & Retention Progress */}
       <section className="space-y-3">
         <div className="flex items-center justify-between border-b border-[#E7E0D8] pb-2">
           <h2 className="text-xs font-bold uppercase tracking-wider text-[#706B66] flex items-center gap-1.5">
@@ -262,7 +266,7 @@ export default function HomeDashboard({
         </div>
       </section>
 
-      {/* 5. Recently Studied Topics */}
+      {/* 6. Recently Studied Topics */}
       <section className="space-y-4">
         <div className="flex items-center justify-between border-b border-[#E7E0D8] pb-2">
           <div className="space-y-0.5">
